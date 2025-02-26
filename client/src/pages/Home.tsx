@@ -5,17 +5,18 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { 
+  ArrowRight, 
+  Beaker, 
   FileText, 
   Users, 
+  TrendingUp, 
   PlusCircle, 
   BarChart3,
-  FlaskConical,
-  Moon,
-  Activity,
-  Clock
+  FlaskConical
 } from "lucide-react";
 
 export default function Home() {
@@ -37,6 +38,24 @@ export default function Home() {
       createdAt: "2023-10-18T09:15:00Z"
     }
   ]);
+  
+  const renderEmptyState = () => (
+    <div className="text-center py-12">
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+        <Beaker className="h-8 w-8 text-primary" />
+      </div>
+      <h3 className="text-lg font-medium text-neutral-800 mb-2">No studies yet</h3>
+      <p className="text-neutral-500 max-w-md mx-auto mb-6">
+        Design your first IRB-ready clinical study in minutes with our AI-powered wizard.
+      </p>
+      <Link href="/study-designer">
+        <Button>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Create Your First Study
+        </Button>
+      </Link>
+    </div>
+  );
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -70,99 +89,73 @@ export default function Home() {
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Hero section */}
-          <div className="mb-12">
-            <div className="max-w-3xl mx-auto">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Studies
+          <div className="mb-12 px-4 py-10 bg-white rounded-xl shadow-sm border border-neutral-100">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">
+                AI-Driven Scientific Studies for Wellness Brands
               </h1>
-              <p className="text-xl text-muted-foreground mb-6">
-                Design and manage your clinical studies for wellness products
+              <p className="text-xl text-neutral-500 mb-8">
+                Design IRB-ready, compliance-focused clinical studies for your wellness products in minutes.
               </p>
-              <div className="flex flex-row justify-start gap-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link href="/study-designer">
-                  <Button size="default" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    New Experiment
+                  <Button size="lg" className="w-full sm:w-auto">
+                    <Beaker className="h-5 w-5 mr-2" />
+                    Design a New Study
                   </Button>
                 </Link>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <FileText className="h-5 w-5 mr-2" />
+                  View Sample Study
+                </Button>
               </div>
             </div>
           </div>
           
-          {/* Key metrics */}
-          <div className="mb-12 grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card className="bg-card hover:bg-card/80 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground mb-1">Average HRV</span>
-                  <div className="flex items-center">
-                    <span className="text-primary text-2xl font-medium mr-2">4.4%</span>
-                    <span className="text-amber-500 text-xs">↓</span>
-                  </div>
-                  <div className="w-full h-1 bg-secondary mt-2 relative">
-                    <div className="absolute h-full w-2/5 bg-amber-500"></div>
-                  </div>
+          {/* Feature highlights */}
+          <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Beaker className="h-6 w-6 text-primary" />
                 </div>
+                <h3 className="text-lg font-medium text-neutral-800 mb-2">AI-Powered Design</h3>
+                <p className="text-neutral-500 mb-4">
+                  Our AI generates scientifically valid claims, recommends outcome measures, and suggests optimal study designs.
+                </p>
+                <Button variant="link" className="p-0 h-auto text-primary flex items-center">
+                  Learn More <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
               </CardContent>
             </Card>
             
-            <Card className="bg-card hover:bg-card/80 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground mb-1">Time Awake</span>
-                  <div className="flex items-center">
-                    <span className="text-primary text-2xl font-medium mr-2">4.18%</span>
-                    <span className="text-amber-500 text-xs">↓</span>
-                  </div>
-                  <div className="w-full h-1 bg-secondary mt-2 relative">
-                    <div className="absolute h-full w-2/5 bg-amber-500"></div>
-                  </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <FileText className="h-6 w-6 text-primary" />
                 </div>
+                <h3 className="text-lg font-medium text-neutral-800 mb-2">IRB-Ready Protocols</h3>
+                <p className="text-neutral-500 mb-4">
+                  Generate complete study protocols that meet IRB submission requirements and comply with regulatory standards.
+                </p>
+                <Button variant="link" className="p-0 h-auto text-primary flex items-center">
+                  Learn More <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
               </CardContent>
             </Card>
             
-            <Card className="bg-card hover:bg-card/80 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground mb-1">REM Sleep</span>
-                  <div className="flex items-center">
-                    <span className="text-primary text-2xl font-medium mr-2">1.64%</span>
-                    <span className="text-primary text-xs">↑</span>
-                  </div>
-                  <div className="w-full h-1 bg-secondary mt-2 relative">
-                    <div className="absolute h-full w-1/4 bg-primary"></div>
-                  </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <TrendingUp className="h-6 w-6 text-primary" />
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-card hover:bg-card/80 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground mb-1">Lowest Heart Rate</span>
-                  <div className="flex items-center">
-                    <span className="text-primary text-2xl font-medium mr-2">0.87%</span>
-                    <span className="text-primary text-xs">↑</span>
-                  </div>
-                  <div className="w-full h-1 bg-secondary mt-2 relative">
-                    <div className="absolute h-full w-1/6 bg-primary"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-card hover:bg-card/80 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground mb-1">Deep Sleep</span>
-                  <div className="flex items-center">
-                    <span className="text-primary text-2xl font-medium mr-2">0.69%</span>
-                    <span className="text-primary text-xs">↑</span>
-                  </div>
-                  <div className="w-full h-1 bg-secondary mt-2 relative">
-                    <div className="absolute h-full w-1/6 bg-primary"></div>
-                  </div>
-                </div>
+                <h3 className="text-lg font-medium text-neutral-800 mb-2">Evidence-Based Results</h3>
+                <p className="text-neutral-500 mb-4">
+                  Create scientific evidence for your product claims with studies that follow rigorous methodologies.
+                </p>
+                <Button variant="link" className="p-0 h-auto text-primary flex items-center">
+                  Learn More <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -170,125 +163,168 @@ export default function Home() {
           {/* Studies section */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground">Active</h2>
+              <h2 className="text-2xl font-bold text-neutral-800">Your Studies</h2>
               <Link href="/study-designer">
-                <Button variant="outline" className="border-primary text-primary hover:bg-card hover:text-primary">
-                  MANAGE
+                <Button>
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  New Study
                 </Button>
               </Link>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {studies.map((study, index) => (
-                <Card key={study.id} className="bg-card hover:bg-card/80 transition-colors border-0">
-                  <CardContent className="p-4">
-                    <div className="flex flex-col h-full">
-                      <div className="flex items-start justify-between">
-                        <div className="mb-2">
-                          {index === 0 && (
-                            <div className="flex items-center mb-1">
-                              <Moon className="h-4 w-4 text-primary mr-1" />
-                              <span className="text-sm text-foreground font-medium">
-                                {study.productName}
-                              </span>
-                            </div>
-                          )}
-                          {index === 1 && (
-                            <div className="flex items-center mb-1">
-                              <Moon className="h-4 w-4 text-primary mr-1" />
-                              <span className="text-sm text-foreground font-medium">
-                                S-Sleep Supplement
-                              </span>
-                            </div>
-                          )}
-                          {index === 0 && (
-                            <div className="inline-block text-xs px-2 py-0.5 bg-primary/30 text-primary rounded-full">
-                              Live
-                            </div>
-                          )}
-                          {index === 1 && (
-                            <div className="inline-block text-xs px-2 py-0.5 bg-primary/30 text-primary rounded-full">
-                              Live
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <span className="inline-flex items-center">
-                            <div className="flex -space-x-2">
-                              <div className="w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center text-[10px] text-white font-medium border border-card">JP</div>
-                              <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-[10px] text-white font-medium border border-card">PO</div>
-                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-[10px] text-white font-medium border border-card">DM</div>
-                            </div>
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-4 flex justify-center">
-                        <Button 
-                          variant="outline" 
-                          className="border-primary text-primary hover:bg-card hover:text-primary w-full"
-                        >
-                          MANAGE
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <Tabs defaultValue="all">
+              <TabsList className="mb-4">
+                <TabsTrigger value="all">All Studies</TabsTrigger>
+                <TabsTrigger value="draft">Drafts</TabsTrigger>
+                <TabsTrigger value="complete">Completed</TabsTrigger>
+              </TabsList>
               
-              <Card className="bg-card hover:bg-card/80 transition-colors border-0">
-                <CardContent className="p-4">
-                  <div className="flex flex-col h-full">
-                    <div className="flex items-start justify-between">
-                      <div className="mb-2">
-                        <div className="flex items-center mb-1">
-                          <Activity className="h-4 w-4 text-muted-foreground mr-1" />
-                          <span className="text-sm text-muted-foreground font-medium">
-                            ShiftWave
-                          </span>
-                        </div>
-                        <div className="inline-block text-xs px-2 py-0.5 bg-secondary text-muted-foreground rounded-full">
-                          Draft
-                        </div>
-                      </div>
-                      <div>
-                        <span className="inline-flex items-center">
-                          <div className="flex -space-x-2">
-                            <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-[10px] text-white font-medium border border-card">JP</div>
-                            <div className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center text-[10px] text-white font-medium border border-card">MO</div>
+              <TabsContent value="all">
+                {studies.length === 0 ? (
+                  renderEmptyState()
+                ) : (
+                  <div className="space-y-4">
+                    {studies.map((study) => (
+                      <Card key={study.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between">
+                            <div className="mb-4 md:mb-0">
+                              <h3 className="font-medium text-lg text-neutral-800">{study.productName}</h3>
+                              {study.refinedClaim ? (
+                                <p className="text-sm text-neutral-600 mt-1">{study.refinedClaim}</p>
+                              ) : (
+                                <p className="text-sm text-neutral-400 italic mt-1">No claim defined yet</p>
+                              )}
+                              <div className="flex items-center mt-2">
+                                <span className="text-xs text-neutral-500">Created {formatDate(study.createdAt)}</span>
+                                <span className="mx-2 text-neutral-300">•</span>
+                                <span className="text-xs flex items-center">
+                                  <span className={`w-2 h-2 rounded-full mr-1 ${
+                                    study.currentStep === 7 ? 'bg-green-500' : 'bg-amber-500'
+                                  }`}></span>
+                                  {study.currentStep === 7 ? 'Complete' : `Step ${study.currentStep}: ${getStepName(study.currentStep)}`}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Link href={`/study-designer/${study.id}`}>
+                                <Button variant="outline" size="sm">
+                                  {study.currentStep === 7 ? 'View Study' : 'Continue'}
+                                </Button>
+                              </Link>
+                              {study.currentStep === 7 && (
+                                <Button size="sm">
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Export
+                                </Button>
+                              )}
+                            </div>
                           </div>
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 flex justify-center">
-                      <Button 
-                        variant="outline" 
-                        className="border-primary text-primary hover:bg-card hover:text-primary w-full"
-                      >
-                        MANAGE
-                      </Button>
-                    </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="draft">
+                <div className="space-y-4">
+                  {studies.filter(s => s.currentStep < 7).length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-neutral-500">No draft studies found.</p>
+                    </div>
+                  ) : (
+                    studies.filter(s => s.currentStep < 7).map((study) => (
+                      <Card key={study.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between">
+                            <div className="mb-4 md:mb-0">
+                              <h3 className="font-medium text-lg text-neutral-800">{study.productName}</h3>
+                              {study.refinedClaim ? (
+                                <p className="text-sm text-neutral-600 mt-1">{study.refinedClaim}</p>
+                              ) : (
+                                <p className="text-sm text-neutral-400 italic mt-1">No claim defined yet</p>
+                              )}
+                              <div className="flex items-center mt-2">
+                                <span className="text-xs text-neutral-500">Created {formatDate(study.createdAt)}</span>
+                                <span className="mx-2 text-neutral-300">•</span>
+                                <span className="text-xs flex items-center">
+                                  <span className="w-2 h-2 rounded-full bg-amber-500 mr-1"></span>
+                                  Step {study.currentStep}: {getStepName(study.currentStep)}
+                                </span>
+                              </div>
+                            </div>
+                            <Link href={`/study-designer/${study.id}`}>
+                              <Button variant="outline" size="sm">
+                                Continue
+                              </Button>
+                            </Link>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="complete">
+                <div className="space-y-4">
+                  {studies.filter(s => s.currentStep === 7).length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-neutral-500">No completed studies found.</p>
+                    </div>
+                  ) : (
+                    studies.filter(s => s.currentStep === 7).map((study) => (
+                      <Card key={study.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between">
+                            <div className="mb-4 md:mb-0">
+                              <h3 className="font-medium text-lg text-neutral-800">{study.productName}</h3>
+                              <p className="text-sm text-neutral-600 mt-1">{study.refinedClaim}</p>
+                              <div className="flex items-center mt-2">
+                                <span className="text-xs text-neutral-500">Created {formatDate(study.createdAt)}</span>
+                                <span className="mx-2 text-neutral-300">•</span>
+                                <span className="text-xs flex items-center">
+                                  <span className="w-2 h-2 rounded-full bg-green-500 mr-1"></span>
+                                  Complete
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Link href={`/study-designer/${study.id}`}>
+                                <Button variant="outline" size="sm">
+                                  View Study
+                                </Button>
+                              </Link>
+                              <Button size="sm">
+                                <FileText className="h-4 w-4 mr-2" />
+                                Export
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
           
           {/* CTA section */}
-          <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-8 text-primary-foreground mt-8">
+          <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-8 text-white">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-2xl font-bold mb-4">Ready to Execute Your Study?</h2>
               <p className="mb-6">
                 Take your protocol from design to execution. Our platform handles participant recruitment, compliance tracking, and data analysis.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button variant="secondary" size="default" className="bg-card text-foreground hover:bg-card/90">
-                  <Users className="h-4 w-4 mr-2" />
+                <Button variant="secondary" size="lg" className="bg-white text-primary hover:bg-neutral-100">
+                  <Users className="h-5 w-5 mr-2" />
                   Recruit Participants
                 </Button>
-                <Button variant="outline" size="default" className="border-card/70 text-foreground hover:bg-card/30">
-                  <BarChart3 className="h-4 w-4 mr-2" />
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                  <BarChart3 className="h-5 w-5 mr-2" />
                   Learn About Analysis
                 </Button>
               </div>
@@ -300,20 +336,20 @@ export default function Home() {
       <Footer />
       
       {/* Developer Test Mode Toggle */}
-      <div className="fixed bottom-4 right-4 bg-card p-2 rounded-lg shadow-md border border-border flex items-center space-x-2">
+      <div className="fixed bottom-4 right-4 bg-white p-2 rounded-lg shadow-md border border-neutral-200 flex items-center space-x-2">
         <div className="flex items-center space-x-2">
           <Switch 
             id="test-mode" 
             checked={isTestMode} 
             onCheckedChange={handleTestModeToggle}
           />
-          <Label htmlFor="test-mode" className="text-xs flex items-center text-foreground">
-            <FlaskConical className="h-4 w-4 mr-1 text-primary" />
+          <Label htmlFor="test-mode" className="text-xs flex items-center">
+            <FlaskConical className="h-4 w-4 mr-1 text-amber-500" />
             Test Mode
           </Label>
         </div>
         {isTestMode && (
-          <span className="bg-primary/20 text-primary text-xs rounded px-1 py-0.5">ON</span>
+          <span className="bg-amber-100 text-amber-800 text-xs rounded px-1 py-0.5">ON</span>
         )}
       </div>
     </div>

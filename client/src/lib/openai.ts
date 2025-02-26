@@ -297,7 +297,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "Multiple sections",
         issue: "Disease claim language detected",
         recommendation: "Replace disease claim language with structure/function language. Avoid terms like 'cure', 'treat', or 'prevent disease'.",
-        severity: 'high' as const
+        severity: 'high'
       });
     }
     
@@ -307,7 +307,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "Informed Consent",
         issue: "Missing or inadequate informed consent procedures",
         recommendation: "Add detailed informed consent procedures, including participant rights, study risks, and data privacy information.",
-        severity: 'high' as const
+        severity: 'high'
       });
     }
     
@@ -318,7 +318,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "Safety Monitoring",
         issue: "Inadequate safety monitoring procedures",
         recommendation: "Add comprehensive safety monitoring and adverse event reporting procedures.",
-        severity: 'medium' as const
+        severity: 'medium'
       });
     }
     
@@ -336,7 +336,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "General",
         issue: "Error evaluating compliance",
         recommendation: "An error occurred while evaluating compliance. Please try again.",
-        severity: 'medium' as const
+        severity: 'medium'
       }]
     };
   }
