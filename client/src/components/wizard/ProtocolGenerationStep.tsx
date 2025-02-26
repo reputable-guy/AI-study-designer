@@ -90,8 +90,28 @@ export default function ProtocolGenerationStep({
           const study = await response.json();
           
           if (study.protocol) {
-            setProtocol(study.protocol);
+            // If protocol exists but no compliance status, add it
+            const existingProtocol = study.protocol;
+            setProtocol(existingProtocol);
             setIsLoading(false);
+            
+            // Check compliance if it wasn't previously checked
+            if (!existingProtocol.complianceStatus) {
+              try {
+                const complianceResult = await checkProtocolCompliance(existingProtocol, refinedClaim);
+                if (complianceResult) {
+                  // Update protocol with compliance results
+                  const updatedProtocol = {
+                    ...existingProtocol,
+                    complianceStatus: complianceResult
+                  };
+                  setProtocol(updatedProtocol);
+                }
+              } catch (complianceError) {
+                console.error("Error checking compliance of existing protocol:", complianceError);
+              }
+            }
+            
             return;
           }
         }
@@ -106,6 +126,26 @@ export default function ProtocolGenerationStep({
         );
         
         setProtocol(generatedProtocol);
+        
+        // Check compliance after generating
+        try {
+          const complianceResult = await checkProtocolCompliance(generatedProtocol, refinedClaim);
+          if (complianceResult) {
+            // Update protocol with compliance results
+            const updatedProtocol = {
+              ...generatedProtocol,
+              complianceStatus: complianceResult
+            };
+            setProtocol(updatedProtocol);
+            
+            // Show compliance dialog if there are issues
+            if (!complianceResult.isCompliant) {
+              setShowCompliance(true);
+            }
+          }
+        } catch (complianceError) {
+          console.error("Error checking initial compliance:", complianceError);
+        }
       } catch (error) {
         console.error("Error generating protocol:", error);
         toast({
@@ -154,7 +194,11 @@ export default function ProtocolGenerationStep({
             title: "Informed Consent",
             content: "All participants will provide written informed consent prior to enrollment."
           }
-        ]
+        ],
+        complianceStatus: {
+          isCompliant: true,
+          issues: []
+        }
       };
     };
     
@@ -433,18 +477,113 @@ export default function ProtocolGenerationStep({
       </Tabs>
       
       {/* Regulatory compliance note */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+      <div className={`mb-6 p-4 ${
+        protocol.complianceStatus?.isCompliant === false 
+          ? 'bg-amber-50 border border-amber-100' 
+          : 'bg-blue-50 border border-blue-100'
+      } rounded-lg`}>
         <div className="flex">
           <div className="flex-shrink-0 mr-3">
-            <FileText className="h-5 w-5 text-blue-500" />
+            {protocol.complianceStatus?.isCompliant === false ? (
+              <Shield className="h-5 w-5 text-amber-500" />
+            ) : (
+              <FileText className="h-5 w-5 text-blue-500" />
+            )}
           </div>
           <div>
-            <h4 className="text-sm font-medium text-blue-800">Regulatory Compliance Assessment</h4>
-            <p className="text-sm text-blue-700 mt-1">
-              This protocol has been automatically checked for regulatory compliance. It aligns with FDA/FTC guidelines for structure/function claims and follows ethical research standards.
+            <h4 className={`text-sm font-medium ${
+              protocol.complianceStatus?.isCompliant === false
+                ? 'text-amber-800'
+                : 'text-blue-800'
+            }`}>
+              Regulatory Compliance Assessment
+            </h4>
+            <p className={`text-sm mt-1 ${
+              protocol.complianceStatus?.isCompliant === false
+                ? 'text-amber-700'
+                : 'text-blue-700'
+            }`}>
+              {protocol.complianceStatus?.isCompliant === false ? (
+                <>
+                  This protocol has <strong>{protocol.complianceStatus.issues?.length} compliance issues</strong> that 
+                  should be addressed. Click "Check Regulatory Compliance" for details.
+                </>
+              ) : (
+                <>
+                  This protocol has been automatically checked for regulatory compliance. It aligns with FDA/FTC guidelines 
+                  for structure/function claims and follows ethical research standards.
+                </>
+              )}
             </p>
           </div>
         </div>
+      </div>
+      
+      {/* Compliance dialog */}
+      <Dialog open={showCompliance} onOpenChange={setShowCompliance}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-amber-700">
+              <Shield className="mr-2 h-5 w-5" />
+              Regulatory Compliance Issues
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 my-4">
+            <p className="text-sm mb-4">
+              The following compliance issues were identified in your protocol. Consider addressing these before finalizing:
+            </p>
+            
+            {protocol.complianceStatus?.issues?.map((issue, index) => (
+              <div key={index} className={`p-3 rounded-md ${
+                issue.severity === 'high' ? 'bg-red-50 text-red-800' :
+                issue.severity === 'medium' ? 'bg-amber-50 text-amber-800' :
+                'bg-blue-50 text-blue-800'
+              }`}>
+                <h4 className="font-medium text-sm mb-1">
+                  {issue.section} - {issue.issue}
+                </h4>
+                <p className="text-xs">
+                  <strong>Recommendation:</strong> {issue.recommendation}
+                </p>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCompliance(false)}
+            >
+              Continue anyway
+            </Button>
+            <Button
+              onClick={() => {
+                setShowCompliance(false);
+                setActiveTab("fullProtocol");
+              }}
+            >
+              Edit Protocol
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Check compliance button */}
+      <div className="mb-6 flex justify-end">
+        <Button
+          variant="outline"
+          onClick={() => checkCompliance(protocol)}
+          disabled={isCheckingCompliance}
+          className="flex items-center"
+        >
+          {isCheckingCompliance ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <ShieldCheck className="mr-2 h-4 w-4" />
+          )}
+          {isCheckingCompliance ? "Checking compliance..." : "Check Regulatory Compliance"}
+        </Button>
       </div>
       
       {/* Navigation buttons */}
