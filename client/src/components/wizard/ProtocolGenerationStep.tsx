@@ -17,35 +17,13 @@ import { generateProtocol, assessRegulatory, checkProtocolCompliance } from "@/l
 import { useToast } from "@/hooks/use-toast";
 import { Check, FileText, AlertCircle, Loader2, Edit, RefreshCw, Save, XCircle, ShieldCheck, Shield } from "lucide-react";
 import { useTestMode } from "@/lib/TestModeContext";
-
-interface ProtocolSection {
-  title: string;
-  content: string;
-}
-
-interface ComplianceIssue {
-  section: string;
-  issue: string;
-  recommendation: string;
-  severity: 'high' | 'medium' | 'low';
-}
-
-interface Protocol {
-  title: string;
-  version: string;
-  date: string;
-  sections: ProtocolSection[];
-  complianceStatus?: {
-    isCompliant: boolean;
-    issues?: ComplianceIssue[];
-  };
-}
+import { Protocol, StudyDesign, OutcomeMeasure } from "@/lib/types";
 
 interface ProtocolGenerationStepProps {
   studyId: number;
   refinedClaim: string;
-  studyDesign: any;
-  outcomeMeasures: any[];
+  studyDesign: StudyDesign;
+  outcomeMeasures: OutcomeMeasure[];
   onNext: (protocol: Protocol) => void;
   onBack: () => void;
 }
@@ -256,7 +234,7 @@ export default function ProtocolGenerationStep({
   };
   
   // Function to check protocol compliance
-  const checkCompliance = async (protocolToCheck: any) => {
+  const checkCompliance = async (protocolToCheck: Protocol) => {
     try {
       setIsCheckingCompliance(true);
       const complianceResult = await checkProtocolCompliance(protocolToCheck, refinedClaim);
