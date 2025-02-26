@@ -7,6 +7,8 @@ import { Check, Info } from "lucide-react";
 import { generateClaimSuggestions } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useTestMode } from "@/lib/TestModeContext";
+import { getFallbackClaims } from "@/lib/errorHandling";
 
 interface ClaimSuggestion {
   id?: number;
@@ -43,11 +45,22 @@ export default function ClaimRefinementStep({
   const [customClaim, setCustomClaim] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { isTestMode } = useTestMode();
   
   useEffect(() => {
     const fetchSuggestedClaims = async () => {
       setIsLoading(true);
       try {
+        // Use fallback data when test mode is enabled
+        if (isTestMode) {
+          console.log("Test mode enabled, using fallback claims data");
+          const fallbackClaims = getFallbackClaims(studyId || 0);
+          setSuggestedClaims(fallbackClaims);
+          console.log("Successfully set claims:", fallbackClaims);
+          setIsLoading(false);
+          return;
+        }
+
         // First check if the studyId is valid before proceeding
         if (!studyId || isNaN(studyId)) {
           console.warn("Missing or invalid study ID, using fallback data only");
@@ -190,7 +203,7 @@ export default function ClaimRefinementStep({
     };
     
     fetchSuggestedClaims();
-  }, [studyId, originalClaim, websiteUrl, ingredients, toast]);
+  }, [studyId, originalClaim, websiteUrl, ingredients, toast, isTestMode]);
   
   const handleSubmit = async () => {
     setIsSubmitting(true);
