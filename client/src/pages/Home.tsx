@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { 
   ArrowRight, 
   Beaker, 
@@ -12,10 +14,13 @@ import {
   Users, 
   TrendingUp, 
   PlusCircle, 
-  BarChart3
+  BarChart3,
+  FlaskConical
 } from "lucide-react";
 
 export default function Home() {
+  const [, navigate] = useLocation();
+  const [testMode, setTestMode] = useState(localStorage.getItem('useTestMode') === 'true');
   const [studies, setStudies] = useState([
     {
       id: 1,
@@ -66,6 +71,15 @@ export default function Home() {
       "Design", "Protocol", "Export"
     ];
     return steps[step - 1] || "Unknown";
+  };
+  
+  // Handle toggling test mode
+  const handleTestModeToggle = (checked: boolean) => {
+    setTestMode(checked);
+    localStorage.setItem('useTestMode', checked ? 'true' : 'false');
+    
+    // Force reload to apply the changes
+    window.location.reload();
   };
   
   return (
@@ -320,6 +334,24 @@ export default function Home() {
       </main>
       
       <Footer />
+      
+      {/* Developer Test Mode Toggle */}
+      <div className="fixed bottom-4 right-4 bg-white p-2 rounded-lg shadow-md border border-neutral-200 flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="test-mode" 
+            checked={testMode} 
+            onCheckedChange={handleTestModeToggle}
+          />
+          <Label htmlFor="test-mode" className="text-xs flex items-center">
+            <FlaskConical className="h-4 w-4 mr-1 text-amber-500" />
+            Test Mode
+          </Label>
+        </div>
+        {testMode && (
+          <span className="bg-amber-100 text-amber-800 text-xs rounded px-1 py-0.5">ON</span>
+        )}
+      </div>
     </div>
   );
 }
