@@ -53,6 +53,16 @@ export default function LiteratureReviewStep({
     const fetchLiteratureReviews = async () => {
       setIsLoading(true);
       try {
+        // If test mode is enabled, use fallback data immediately
+        if (isTestMode) {
+          console.log("Test mode enabled, using fallback literature review data");
+          const fallbackReviews = getFallbackLiteratureReviews(studyId);
+          setStudies(fallbackReviews);
+          setFilteredStudies(fallbackReviews);
+          setIsLoading(false);
+          return;
+        }
+        
         // First try to get literature reviews from the API
         const response = await fetch(`/api/literature-reviews/study/${studyId}`);
         
@@ -80,62 +90,17 @@ export default function LiteratureReviewStep({
           variant: "destructive",
         });
         
-        // Fallback data
-        const fallbackStudies = [
-          {
-            id: 1,
-            studyId: 1,
-            title: "Effects of magnesium supplementation on sleep quality",
-            authors: "Nielsen, FH. et al.",
-            journal: "Journal of Sleep Research",
-            year: 2018,
-            sampleSize: 126,
-            effectSize: "18.7% increase in REM",
-            dosage: "320mg daily",
-            duration: "8 weeks",
-            evidenceGrade: "High" as const,
-            summary: "Double-blind, placebo-controlled trial examining the effects of magnesium supplementation on sleep architecture in adults with mild insomnia.",
-            details: "Significant improvements were observed in REM sleep duration, sleep efficiency, and subjective sleep quality. Key findings: Magnesium supplementation significantly increased REM sleep percentage compared to placebo (p<0.01). Secondary outcomes included reduced sleep onset latency and improved sleep efficiency."
-          },
-          {
-            id: 2,
-            studyId: 1,
-            title: "Magnesium glycinate and sleep architecture: A wearable study",
-            authors: "Johnson, KL. et al.",
-            journal: "Sleep Medicine",
-            year: 2020,
-            sampleSize: 48,
-            effectSize: "14.2% increase in REM",
-            dosage: "300mg daily",
-            duration: "4 weeks",
-            evidenceGrade: "Moderate" as const,
-            summary: "Study using consumer wearable devices to track sleep changes with magnesium supplementation."
-          },
-          {
-            id: 3,
-            studyId: 1,
-            title: "Effects of mineral supplementation on sleep parameters",
-            authors: "Tanaka, H. et al.",
-            journal: "Sleep Science",
-            year: 2019,
-            sampleSize: 22,
-            effectSize: "9.8% increase in REM",
-            dosage: "250mg daily",
-            duration: "3 weeks",
-            evidenceGrade: "Low" as const,
-            summary: "Small pilot study on the effects of various minerals on sleep."
-          }
-        ];
-        
-        setStudies(fallbackStudies);
-        setFilteredStudies(fallbackStudies);
+        // Fallback data - use the centralized fallback data
+        const fallbackReviews = getFallbackLiteratureReviews(studyId);
+        setStudies(fallbackReviews);
+        setFilteredStudies(fallbackReviews);
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchLiteratureReviews();
-  }, [studyId, refinedClaim, toast]);
+  }, [studyId, refinedClaim, toast, isTestMode]);
   
   useEffect(() => {
     // Filter studies based on search term
@@ -159,7 +124,20 @@ export default function LiteratureReviewStep({
     
     setIsAiProcessing(true);
     try {
-      // Simulate AI processing time
+      // Always use the same response in test mode for consistency
+      if (isTestMode) {
+        await new Promise(resolve => setTimeout(resolve, 300)); // Faster response in test mode
+        
+        toast({
+          title: "AI Assistant (Test Mode)",
+          description: "I found 2 studies specifically measuring REM sleep in women over 40. The effect sizes were slightly higher in this demographic (20.3% vs. 18.7% overall increase).",
+        });
+        
+        setAiQuery("");
+        return;
+      }
+      
+      // Regular AI processing for normal mode
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({

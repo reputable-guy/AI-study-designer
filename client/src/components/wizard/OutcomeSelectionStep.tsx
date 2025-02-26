@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Check, Info, AlertTriangle } from "lucide-react";
 import { OutcomeMeasure } from "@/lib/types";
 import { withErrorHandling, getFallbackOutcomeMeasures } from "@/lib/errorHandling";
+import { useTestMode } from "@/lib/TestModeContext";
 
 interface OutcomeSelectionStepProps {
   studyId: number;
@@ -27,11 +28,21 @@ export default function OutcomeSelectionStep({
   const [selectedMeasureId, setSelectedMeasureId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { isTestMode } = useTestMode();
   
   useEffect(() => {
     const fetchOutcomeMeasures = async () => {
       setIsLoading(true);
       try {
+        // If test mode is enabled, use fallback data immediately
+        if (isTestMode) {
+          console.log("Test mode enabled, using fallback outcome measures data");
+          const fallbackMeasures = getFallbackOutcomeMeasures(studyId);
+          setOutcomeMeasures(fallbackMeasures);
+          setIsLoading(false);
+          return;
+        }
+        
         // First try to get outcome measures from the API
         const response = await fetch(`/api/outcome-measures/study/${studyId}`);
         
@@ -74,7 +85,7 @@ export default function OutcomeSelectionStep({
     };
     
     fetchOutcomeMeasures();
-  }, [studyId, refinedClaim, toast]);
+  }, [studyId, refinedClaim, toast, isTestMode]);
   
   const handleSubmit = async () => {
     if (!selectedMeasureId) {
@@ -88,7 +99,16 @@ export default function OutcomeSelectionStep({
     
     setIsSubmitting(true);
     try {
-      // Use the error handling utility to make the API call
+      // In test mode, skip the API call
+      if (isTestMode) {
+        console.log("Test mode enabled, skipping API call for outcome measure selection");
+        // Simulate a brief delay for better user experience
+        await new Promise(resolve => setTimeout(resolve, 300));
+        onNext();
+        return;
+      }
+      
+      // Use the error handling utility to make the API call in regular mode
       const success = await withErrorHandling(
         async () => {
           const response = await fetch(`/api/outcome-measures/${selectedMeasureId}/select`, {

@@ -7,6 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import { recommendStudyDesign } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Info, Check } from "lucide-react";
+import { useTestMode } from "@/lib/TestModeContext";
+import { getFallbackStudyDesign } from "@/lib/errorHandling";
 
 interface StudyDesign {
   type: string;
