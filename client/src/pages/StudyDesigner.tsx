@@ -240,7 +240,7 @@ export default function StudyDesigner() {
   }
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-neutral-50">
       <Header />
       
       <main className="flex-grow">
@@ -271,8 +271,8 @@ export default function StudyDesigner() {
                     index + 1 === currentStep 
                       ? 'border-b-2 border-primary text-primary' 
                       : index + 1 < currentStep
-                        ? 'text-muted-foreground'
-                        : 'text-muted-foreground/60'
+                        ? 'text-neutral-600'
+                        : 'text-neutral-400'
                   }`}
                 >
                   {index + 1}. {step}

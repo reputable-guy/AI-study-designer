@@ -119,7 +119,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
             name="websiteUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Website URL <span className="text-muted-foreground/70">(optional)</span></FormLabel>
+                <FormLabel>Website URL <span className="text-neutral-500">(optional)</span></FormLabel>
                 <FormControl>
                   <Input 
                     type="url"
@@ -128,7 +128,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                     {...field} 
                   />
                 </FormControl>
-                <p className="text-xs text-muted-foreground/70 mt-1">We'll analyze your website to better understand your product.</p>
+                <p className="text-xs text-neutral-500 mt-1">We'll analyze your website to better understand your product.</p>
                 <FormMessage />
               </FormItem>
             )}
@@ -139,7 +139,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
             name="ingredients"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Active ingredients <span className="text-muted-foreground/70">(optional)</span></FormLabel>
+                <FormLabel>Active ingredients <span className="text-neutral-500">(optional)</span></FormLabel>
                 <FormControl>
                   <Textarea 
                     placeholder="Example: Magnesium bisglycinate (300mg), Zinc (15mg), Vitamin B6 (2mg)" 
