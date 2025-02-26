@@ -256,29 +256,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         messages: [
           {
             role: "system",
-            content: `You are an expert in clinical study design for wellness products. 
-            You help refine product claims into testable, measurable claims that could be supported through clinical research. 
-            Provide 3 alternative, refined versions of the product claim with these characteristics:
-            1. More specific and measurable
-            2. Focus on clear outcomes and durations
-            3. Quantify effects where possible 
-            
-            For each claim, analyze:
-            - Measurability (how easily it can be tested)
-            - Prior evidence (existence of research supporting this type of claim)
-            - Participant burden (how demanding the study would be for participants)
-            - Whether it could be measured with a wearable device
-            - Whether it is relatable to consumers
-            
-            Format response as JSON array of objects with these properties:
-            { 
-              "claim": "refined claim statement",
-              "measurability": "description",
-              "priorEvidence": "description",
-              "participantBurden": "description",
-              "wearableCompatible": boolean,
-              "consumerRelatable": boolean 
-            }`
+            content: `You are an expert in clinical study design for wellness products. Your task is to refine product claims into testable, measurable claims for clinical research.
+
+IMPORTANT: You MUST return exactly 3 claim suggestions in the specified JSON format. Your output MUST be a JSON object with a "suggestions" array containing exactly 3 objects, each with all required fields.
+
+Provide 3 refined versions of the product claim with these characteristics:
+1. More specific and measurable
+2. Focus on clear outcomes and durations
+3. Quantify effects where possible (use percentages or concrete numbers)
+
+For each claim, provide the following analysis:
+- Measurability: How easily it can be tested with standard methods
+- Prior evidence: Existence of research supporting this type of claim
+- Participant burden: How demanding the study would be for participants
+- Wearable compatibility: Whether it could be measured with a wearable device (true/false)
+- Consumer relatability: Whether the claim is easy for consumers to understand (true/false)
+
+YOUR RESPONSE MUST BE A VALID JSON OBJECT WITH THIS EXACT STRUCTURE:
+{
+  "suggestions": [
+    {
+      "claim": "First refined claim statement with specific outcome and duration",
+      "measurability": "Description of how this would be measured",
+      "priorEvidence": "Description of existing research",
+      "participantBurden": "Description of participant requirements",
+      "wearableCompatible": true or false,
+      "consumerRelatable": true or false
+    },
+    {
+      "claim": "Second refined claim statement",
+      "measurability": "Description of how this would be measured",
+      "priorEvidence": "Description of existing research",
+      "participantBurden": "Description of participant requirements",
+      "wearableCompatible": true or false,
+      "consumerRelatable": true or false
+    },
+    {
+      "claim": "Third refined claim statement",
+      "measurability": "Description of how this would be measured",
+      "priorEvidence": "Description of existing research",
+      "participantBurden": "Description of participant requirements",
+      "wearableCompatible": true or false,
+      "consumerRelatable": true or false
+    }
+  ]
+}`
           },
           {
             role: "user",
@@ -300,15 +322,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = JSON.parse(content);
       console.log("OpenAI response format:", result);
       
-      // Handle different possible response formats
-      // The API might return:
-      // 1. An array directly
-      // 2. An object with a 'claims' property containing the array
-      // 3. An object with each claim as a separate property (like claim1, claim2, claim3)
-      
+      // Handle different possible response formats, prioritizing the expected "suggestions" array
       let claims = [];
       
-      if (Array.isArray(result)) {
+      // First check for our expected format - an object with a suggestions array
+      if (result.suggestions && Array.isArray(result.suggestions)) {
+        claims = result.suggestions;
+      }
+      // Fallback handling for different response formats
+      else if (Array.isArray(result)) {
         claims = result;
       } else if (result.claims && Array.isArray(result.claims)) {
         claims = result.claims;
@@ -322,15 +344,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const claimKeys = Object.keys(result).filter(key => key.startsWith('claim'));
           claims = claimKeys.map(key => result[key]);
         }
+        // Check for suggestions1, suggestions2, etc.
+        else if (Object.keys(result).some(key => key.startsWith('suggestion'))) {
+          const suggestionKeys = Object.keys(result).filter(key => key.startsWith('suggestion'));
+          claims = suggestionKeys.map(key => result[key]);
+        }
         // If we have numeric keys, it might be an object with numeric keys instead of an array
         else if (Object.keys(result).some(key => !isNaN(parseInt(key)))) {
           claims = Object.values(result);
         }
       }
       
+      // Validate the result
       if (claims.length === 0) {
         console.error("Invalid OpenAI response format:", result);
         throw new Error("Invalid response format from AI service");
+      }
+      
+      // Ensure all claims have the required fields
+      claims = claims.filter((claim: any) => {
+        return claim && typeof claim === 'object' && 
+               typeof claim.claim === 'string' && 
+               typeof claim.measurability === 'string' &&
+               typeof claim.priorEvidence === 'string' &&
+               typeof claim.participantBurden === 'string';
+      });
+      
+      if (claims.length === 0) {
+        console.error("No valid claims found in response:", result);
+        throw new Error("No valid claims found in AI response");
       }
       
       res.json(claims);
