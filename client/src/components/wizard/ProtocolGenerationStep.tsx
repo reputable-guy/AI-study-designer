@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateProtocol } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
 import { Check, FileText, AlertCircle, Loader2 } from "lucide-react";
+import { useTestMode } from "@/lib/TestModeContext";
 
 interface ProtocolSection {
   title: string;
@@ -41,11 +42,22 @@ export default function ProtocolGenerationStep({
   const [protocol, setProtocol] = useState<Protocol | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
+  const { isTestMode } = useTestMode();
   
   useEffect(() => {
     const fetchProtocol = async () => {
       setIsLoading(true);
       try {
+        // If test mode is enabled, use fallback data immediately
+        if (isTestMode) {
+          console.log("Test mode enabled, using fallback protocol data");
+          const fallbackProtocol = createFallbackProtocol(refinedClaim);
+          setProtocol(fallbackProtocol);
+          setIsLoading(false);
+          setIsGenerating(false);
+          return;
+        }
+        
         // First check if protocol already exists in study
         const response = await fetch(`/api/studies/${studyId}`);
         
@@ -73,43 +85,12 @@ export default function ProtocolGenerationStep({
         console.error("Error generating protocol:", error);
         toast({
           title: "Error",
-          description: "Failed to generate protocol. Please try again.",
+          description: "Failed to generate protocol. Using default protocol.",
           variant: "destructive",
         });
         
         // Fallback data
-        const fallbackProtocol = {
-          title: "Clinical Study Protocol",
-          version: "1.0",
-          date: new Date().toISOString().split('T')[0],
-          sections: [
-            {
-              title: "Study Objectives",
-              content: `To evaluate the effectiveness of the product in ${refinedClaim}`
-            },
-            {
-              title: "Study Design",
-              content: "Randomized, double-blind, placebo-controlled trial"
-            },
-            {
-              title: "Statistical Plan",
-              content: "Power analysis based on prior studies suggests a sample size of 80 participants would provide 90% power to detect the expected effect size."
-            },
-            {
-              title: "Outcome Measures",
-              content: "Primary outcome measure: REM sleep duration as measured by wearable device."
-            },
-            {
-              title: "Safety Monitoring",
-              content: "Adverse events will be monitored throughout the study period."
-            },
-            {
-              title: "Informed Consent",
-              content: "All participants will provide written informed consent prior to enrollment."
-            }
-          ]
-        };
-        
+        const fallbackProtocol = createFallbackProtocol(refinedClaim);
         setProtocol(fallbackProtocol);
       } finally {
         setIsLoading(false);
@@ -117,8 +98,43 @@ export default function ProtocolGenerationStep({
       }
     };
     
+    // Helper function to create fallback protocol
+    const createFallbackProtocol = (claimText: string): Protocol => {
+      return {
+        title: "Clinical Study Protocol",
+        version: "1.0",
+        date: new Date().toISOString().split('T')[0],
+        sections: [
+          {
+            title: "Study Objectives",
+            content: `To evaluate the effectiveness of the product in ${claimText}`
+          },
+          {
+            title: "Study Design",
+            content: "Randomized, double-blind, placebo-controlled trial"
+          },
+          {
+            title: "Statistical Plan",
+            content: "Power analysis based on prior studies suggests a sample size of 80 participants would provide 90% power to detect the expected effect size."
+          },
+          {
+            title: "Outcome Measures",
+            content: "Primary outcome measure: REM sleep duration as measured by wearable device."
+          },
+          {
+            title: "Safety Monitoring",
+            content: "Adverse events will be monitored throughout the study period."
+          },
+          {
+            title: "Informed Consent",
+            content: "All participants will provide written informed consent prior to enrollment."
+          }
+        ]
+      };
+    };
+    
     fetchProtocol();
-  }, [studyId, refinedClaim, studyDesign, outcomeMeasures, toast]);
+  }, [studyId, refinedClaim, studyDesign, outcomeMeasures, toast, isTestMode]);
   
   const handleContinue = () => {
     if (protocol) {

@@ -45,11 +45,23 @@ export default function StudyDesignStep({
   const [sampleSize, setSampleSize] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { isTestMode } = useTestMode();
   
   useEffect(() => {
     const fetchStudyDesign = async () => {
       setIsLoading(true);
       try {
+        // If test mode is enabled, use fallback data immediately
+        if (isTestMode) {
+          console.log("Test mode enabled, using fallback study design data");
+          const fallbackDesign = getFallbackStudyDesign();
+          setStudyDesign(fallbackDesign);
+          setSampleSize(fallbackDesign.sampleSize.recommended);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Regular mode - make the API call
         const design = await recommendStudyDesign(refinedClaim, outcomeMeasures);
         setStudyDesign(design);
         setSampleSize(design.sampleSize.recommended);
@@ -61,30 +73,8 @@ export default function StudyDesignStep({
           variant: "destructive",
         });
         
-        // Fallback data
-        const fallbackDesign: StudyDesign = {
-          type: "Randomized Controlled Trial",
-          sampleSize: {
-            min: 60,
-            recommended: 80,
-            max: 120
-          },
-          duration: "8 weeks",
-          blindingType: "Double-blind",
-          controlType: "Placebo-controlled",
-          inclusionCriteria: [
-            "Adults aged 18-65",
-            "Self-reported sleep difficulties",
-            "No current use of sleep medications"
-          ],
-          exclusionCriteria: [
-            "Diagnosed sleep disorders requiring treatment",
-            "Current use of supplements containing magnesium",
-            "Pregnancy or breastfeeding"
-          ],
-          powerAnalysis: "Based on previous studies, a sample size of 80 participants provides 90% power to detect a 15% increase in REM sleep at a significance level of 0.05."
-        };
-        
+        // Use the centralized fallback data
+        const fallbackDesign = getFallbackStudyDesign();
         setStudyDesign(fallbackDesign);
         setSampleSize(fallbackDesign.sampleSize.recommended);
       } finally {
@@ -93,7 +83,7 @@ export default function StudyDesignStep({
     };
     
     fetchStudyDesign();
-  }, [refinedClaim, outcomeMeasures, toast]);
+  }, [refinedClaim, outcomeMeasures, toast, isTestMode]);
   
   const handleSubmit = async () => {
     setIsSubmitting(true);
