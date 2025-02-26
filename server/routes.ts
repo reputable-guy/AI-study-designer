@@ -298,14 +298,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const result = JSON.parse(content);
+      console.log("OpenAI response format:", result);
       
-      if (!result.claims && !Array.isArray(result)) {
+      // Handle different possible response formats
+      // The API might return:
+      // 1. An array directly
+      // 2. An object with a 'claims' property containing the array
+      // 3. An object with each claim as a separate property (like claim1, claim2, claim3)
+      
+      let claims = [];
+      
+      if (Array.isArray(result)) {
+        claims = result;
+      } else if (result.claims && Array.isArray(result.claims)) {
+        claims = result.claims;
+      } else if (typeof result === 'object') {
+        // If single object with claim properties, wrap it in an array
+        if (result.claim) {
+          claims = [result];
+        } 
+        // Check for numbered claims like claim1, claim2, etc.
+        else if (Object.keys(result).some(key => key.startsWith('claim'))) {
+          const claimKeys = Object.keys(result).filter(key => key.startsWith('claim'));
+          claims = claimKeys.map(key => result[key]);
+        }
+        // If we have numeric keys, it might be an object with numeric keys instead of an array
+        else if (Object.keys(result).some(key => !isNaN(parseInt(key)))) {
+          claims = Object.values(result);
+        }
+      }
+      
+      if (claims.length === 0) {
         console.error("Invalid OpenAI response format:", result);
         throw new Error("Invalid response format from AI service");
       }
-      
-      // Handle different possible response formats
-      const claims = Array.isArray(result) ? result : (result.claims || []);
       
       res.json(claims);
     } catch (error) {

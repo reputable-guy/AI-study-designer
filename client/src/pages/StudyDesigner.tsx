@@ -4,7 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProgressIndicator from "@/components/wizard/ProgressIndicator";
 import QuickStartStep from "@/components/wizard/QuickStartStep";
-import ClaimRefinementStep from "@/components/wizard/ClaimRefinementStep";
+import ClaimRefinementStep from "@/components/wizard/ClaimRefinementStepNew";
 import LiteratureReviewStep from "@/components/wizard/LiteratureReviewStep";
 import OutcomeSelectionStep from "@/components/wizard/OutcomeSelectionStep";
 import StudyDesignStep from "@/components/wizard/StudyDesignStep";
