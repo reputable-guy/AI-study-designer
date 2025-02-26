@@ -361,7 +361,7 @@ export default function ClaimRefinementStep({
       ) : (
         <Info className="h-4 w-4 text-amber-500 mr-1" />
       )}
-      <span className="text-xs text-neutral-600">{text}</span>
+      <span className="text-xs text-muted-foreground">{text}</span>
     </div>
   );
   
@@ -369,33 +369,33 @@ export default function ClaimRefinementStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold">Refine your claim</h2>
-          <p className="text-neutral-500">Based on your input, we've identified potential scientific claims you can test.</p>
+          <h2 className="text-xl font-semibold text-foreground">Refine your claim</h2>
+          <p className="text-muted-foreground">Based on your input, we've identified potential scientific claims you can test.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Generated</span>
+          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Generated</span>
         </div>
       </div>
 
       {/* Original claim */}
-      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
-        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your original input:</h3>
-        <p className="text-neutral-700">{originalClaim}</p>
+      <div className="mb-6 p-4 bg-card rounded-lg border border-border">
+        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your original input:</h3>
+        <p className="text-foreground">{originalClaim}</p>
       </div>
 
       {/* AI-generated claim suggestions */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-neutral-700 mb-3">Select a refined claim to test:</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">Select a refined claim to test:</h3>
         
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
-                <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
+              <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
+                <div className="h-6 bg-muted rounded w-3/4 mb-3"></div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-2/3"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -406,7 +406,7 @@ export default function ClaimRefinementStep({
               {suggestedClaims.map((claim) => (
                 <div 
                   key={claim.id} 
-                  className="ai-suggestion p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="ai-suggestion p-4 bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => setSelectedClaimId(claim.id?.toString() || "")}
                 >
                   <div className="flex items-start">
@@ -416,7 +416,7 @@ export default function ClaimRefinementStep({
                     <div className="flex-grow">
                       <Label 
                         htmlFor={`claim-${claim.id}`}
-                        className="block font-medium text-neutral-800 cursor-pointer"
+                        className="block font-medium text-foreground cursor-pointer"
                       >
                         {claim.claim}
                       </Label>
@@ -443,7 +443,7 @@ export default function ClaimRefinementStep({
               
               {/* Custom claim option */}
               <div 
-                className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="p-4 bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => setSelectedClaimId("custom")}
               >
                 <div className="flex items-start">
@@ -453,7 +453,7 @@ export default function ClaimRefinementStep({
                   <div className="flex-grow">
                     <Label 
                       htmlFor="customClaim"
-                      className="block font-medium text-neutral-800 cursor-pointer"
+                      className="block font-medium text-foreground cursor-pointer"
                     >
                       Or write your own refined claim
                     </Label>
@@ -465,9 +465,9 @@ export default function ClaimRefinementStep({
                           value={customClaim}
                           onChange={(e) => setCustomClaim(e.target.value)}
                           placeholder="Describe a specific, measurable claim to test..."
-                          className="w-full"
+                          className="w-full bg-card border-border"
                         />
-                        <p className="mt-1 text-xs text-neutral-500">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           Note: Custom claims may need additional review to ensure they're measurable and compliant.
                         </p>
                       </div>
@@ -489,8 +489,8 @@ export default function ClaimRefinementStep({
             </svg>
           </div>
         </div>
-        <div className="p-3 bg-neutral-50 rounded-lg max-w-lg shadow-sm">
-          <p className="text-sm text-neutral-700">
+        <div className="p-3 bg-card border border-border rounded-lg max-w-lg shadow-sm">
+          <p className="text-sm text-foreground">
             <span className="font-medium">AI Research Assistant:</span> The first claim is specifically designed for wearable study compatibility. We found 3 clinical studies that measured similar REM outcomes with magnesium supplementation using the Oura ring and other sleep trackers.
           </p>
         </div>
@@ -498,19 +498,20 @@ export default function ClaimRefinementStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
+        <button 
+          className="btn-outline-reputable px-4 py-2 rounded"
           onClick={onBack}
           disabled={isSubmitting}
         >
           Back
-        </Button>
-        <Button 
+        </button>
+        <button 
+          className="btn-reputable px-4 py-2 rounded"
           onClick={handleSubmit}
           disabled={isSubmitting || !selectedClaimId || (selectedClaimId === "custom" && !customClaim.trim())}
         >
           {isSubmitting ? "Processing..." : "Continue"}
-        </Button>
+        </button>
       </div>
     </div>
   );
