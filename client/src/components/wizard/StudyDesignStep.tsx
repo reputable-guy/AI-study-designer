@@ -49,6 +49,7 @@ interface StudyDesign {
   inclusionCriteria: string[];
   exclusionCriteria: string[];
   powerAnalysis: string;
+  recruitmentDifficulty?: number;
 }
 
 interface StudyDesignStepProps {
@@ -58,6 +59,38 @@ interface StudyDesignStepProps {
   onNext: () => void;
   onBack: () => void;
 }
+
+// Helper function to calculate recruitment difficulty based on inclusion/exclusion criteria
+const calculateRecruitmentDifficulty = (inclusionCriteria: string[], exclusionCriteria: string[]) => {
+  // Base difficulty starts at 3 (moderate)
+  let difficulty = 3;
+  
+  // Each criterion affects the difficulty
+  const totalCriteria = inclusionCriteria.length + exclusionCriteria.length;
+  
+  // More criteria make recruitment harder
+  if (totalCriteria > 8) difficulty += 2;
+  else if (totalCriteria > 5) difficulty += 1;
+  
+  // Look for particularly challenging criteria
+  const allCriteria = [...inclusionCriteria, ...exclusionCriteria].map(c => c.toLowerCase());
+  
+  // Check for criteria that make recruitment particularly difficult
+  const hardCriteriaKeywords = [
+    'rare', 'specific', 'severe', 'unusual', 'uncommon', 'specialized', 
+    'narrow', 'restricted', 'limited', 'unique', 'exclusive'
+  ];
+  
+  for (const keyword of hardCriteriaKeywords) {
+    if (allCriteria.some(c => c.includes(keyword))) {
+      difficulty += 1;
+      break; // Only add 1 point max for hard criteria
+    }
+  }
+  
+  // Cap the difficulty at 10
+  return Math.min(10, difficulty);
+};
 
 export default function StudyDesignStep({
   studyId,
@@ -70,6 +103,14 @@ export default function StudyDesignStep({
   const [studyDesign, setStudyDesign] = useState<StudyDesign | null>(null);
   const [sampleSize, setSampleSize] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inclusionCriteria, setInclusionCriteria] = useState<string[]>([]);
+  const [exclusionCriteria, setExclusionCriteria] = useState<string[]>([]);
+  const [recruitmentDifficulty, setRecruitmentDifficulty] = useState<number>(0);
+  const [newInclusionCriterion, setNewInclusionCriterion] = useState<string>("");
+  const [newExclusionCriterion, setNewExclusionCriterion] = useState<string>("");
+  const [editingInclusionIndex, setEditingInclusionIndex] = useState<number | null>(null);
+  const [editingExclusionIndex, setEditingExclusionIndex] = useState<number | null>(null);
+  const [showDifficultyInfo, setShowDifficultyInfo] = useState<boolean>(false);
   const { toast } = useToast();
   const { isTestMode } = useTestMode();
   
@@ -83,6 +124,12 @@ export default function StudyDesignStep({
           const fallbackDesign = getFallbackStudyDesign();
           setStudyDesign(fallbackDesign);
           setSampleSize(fallbackDesign.sampleSize.recommended);
+          setInclusionCriteria(fallbackDesign.inclusionCriteria);
+          setExclusionCriteria(fallbackDesign.exclusionCriteria);
+          setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+            fallbackDesign.inclusionCriteria, 
+            fallbackDesign.exclusionCriteria
+          ));
           setIsLoading(false);
           return;
         }
@@ -91,6 +138,12 @@ export default function StudyDesignStep({
         const design = await recommendStudyDesign(refinedClaim, outcomeMeasures);
         setStudyDesign(design);
         setSampleSize(design.sampleSize.recommended);
+        setInclusionCriteria(design.inclusionCriteria);
+        setExclusionCriteria(design.exclusionCriteria);
+        setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+          design.inclusionCriteria, 
+          design.exclusionCriteria
+        ));
       } catch (error) {
         console.error("Error fetching study design recommendations:", error);
         toast({
@@ -103,6 +156,12 @@ export default function StudyDesignStep({
         const fallbackDesign = getFallbackStudyDesign();
         setStudyDesign(fallbackDesign);
         setSampleSize(fallbackDesign.sampleSize.recommended);
+        setInclusionCriteria(fallbackDesign.inclusionCriteria);
+        setExclusionCriteria(fallbackDesign.exclusionCriteria);
+        setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+          fallbackDesign.inclusionCriteria, 
+          fallbackDesign.exclusionCriteria
+        ));
       } finally {
         setIsLoading(false);
       }
