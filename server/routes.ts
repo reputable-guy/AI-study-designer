@@ -87,6 +87,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(claims);
   });
   
+  // Claim generation endpoint
+  apiRouter.post("/suggested-claims/generate", async (req: Request, res: Response) => {
+    // In a real implementation, this would call the OpenAI API
+    // For the demo, we return static sample data
+    const sampleClaims = [
+      {
+        claim: "Daily consumption of 300mg magnesium bisglycinate increases REM sleep duration by 15-20%",
+        measurability: "Easily measurable",
+        priorEvidence: "Prior evidence exists",
+        participantBurden: "Low",
+        wearableCompatible: true,
+        consumerRelatable: true
+      },
+      {
+        claim: "Magnesium supplementation (300mg daily) improves sleep quality as measured by PSQI score improvement of 2+ points",
+        measurability: "Moderate",
+        priorEvidence: "Strong previous evidence",
+        participantBurden: "Higher",
+        wearableCompatible: false,
+        consumerRelatable: true
+      },
+      {
+        claim: "Regular magnesium supplementation reduces nighttime awakenings by 30% and decreases time to fall asleep by 10+ minutes",
+        measurability: "Moderate",
+        priorEvidence: "Limited previous studies",
+        participantBurden: "Low",
+        wearableCompatible: true,
+        consumerRelatable: true
+      }
+    ];
+    
+    res.json(sampleClaims);
+  });
+
+  // Create suggested claim
+  apiRouter.post("/suggested-claims", async (req: Request, res: Response) => {
+    try {
+      // Validate that studyId is present
+      if (!req.body.studyId || isNaN(parseInt(req.body.studyId))) {
+        return res.status(400).json({ message: "Valid studyId is required" });
+      }
+      
+      const claim = await storage.createSuggestedClaim(req.body);
+      res.json(claim);
+    } catch (err) {
+      console.error("Error creating suggested claim:", err);
+      res.status(500).json({ message: "Failed to create suggested claim" });
+    }
+  });
+  
   apiRouter.post("/suggested-claims/:id/select", async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {

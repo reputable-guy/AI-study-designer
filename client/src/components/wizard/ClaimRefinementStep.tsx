@@ -48,6 +48,11 @@ export default function ClaimRefinementStep({
     const fetchSuggestedClaims = async () => {
       setIsLoading(true);
       try {
+        // First check if the studyId is valid before proceeding
+        if (!studyId || isNaN(studyId)) {
+          throw new Error("Invalid study ID");
+        }
+        
         // First try to get suggested claims from the API
         const response = await fetch(`/api/suggested-claims/study/${studyId}`);
         
@@ -57,9 +62,9 @@ export default function ClaimRefinementStep({
           if (claims && claims.length > 0) {
             setSuggestedClaims(claims);
             // If there's a selected claim, set it
-            const selectedClaim = claims.find(c => c.selected);
+            const selectedClaim = claims.find((c: ClaimSuggestion) => c.selected);
             if (selectedClaim) {
-              setSelectedClaimId(selectedClaim.id.toString());
+              setSelectedClaimId(selectedClaim.id?.toString() || "");
             }
             setIsLoading(false);
             return;
@@ -73,15 +78,25 @@ export default function ClaimRefinementStep({
           ingredients
         );
         
+        // Create a new array to hold all claims with IDs
+        const newClaimsWithIds = [];
+        
         // Save the generated claims to the backend
         for (const claim of generatedClaims) {
-          const savedClaim = await apiRequest("POST", "/api/suggested-claims", {
-            studyId,
-            ...claim
-          });
-          const claimWithId = await savedClaim.json();
-          setSuggestedClaims(prev => [...prev, claimWithId]);
+          try {
+            const savedClaim = await apiRequest("POST", "/api/suggested-claims", {
+              studyId,
+              ...claim
+            });
+            
+            const claimWithId = await savedClaim.json();
+            newClaimsWithIds.push(claimWithId);
+          } catch (claimError) {
+            console.error("Error saving individual claim:", claimError);
+          }
         }
+        
+        setSuggestedClaims(newClaimsWithIds);
       } catch (error) {
         console.error("Error fetching claim suggestions:", error);
         toast({
@@ -153,15 +168,49 @@ export default function ClaimRefinementStep({
         
         onNext(customClaim);
       } else if (selectedClaimId) {
-        // Select the claim in the backend
-        const response = await apiRequest(
-          "POST", 
-          `/api/suggested-claims/${selectedClaimId}/select`,
-          {}
-        );
-        
-        const selectedClaim = await response.json();
-        onNext(selectedClaim.claim);
+        try {
+          // Check if we have a negative ID (fallback data)
+          if (selectedClaimId && parseInt(selectedClaimId) < 0) {
+            // With fallback data, just find the claim and use it directly
+            const selectedClaim = suggestedClaims.find((c: ClaimSuggestion) => c.id?.toString() === selectedClaimId);
+            if (selectedClaim) {
+              // Update study with the selected claim
+              await apiRequest("PATCH", `/api/studies/${studyId}`, {
+                refinedClaim: selectedClaim.claim,
+                currentStep: 3 // Move to next step
+              });
+              
+              onNext(selectedClaim.claim);
+              return;
+            }
+          }
+          
+          // Regular flow for real claim IDs
+          const response = await apiRequest(
+            "POST", 
+            `/api/suggested-claims/${selectedClaimId}/select`,
+            {}
+          );
+          
+          const selectedClaim = await response.json();
+          onNext(selectedClaim.claim);
+        } catch (selectionError) {
+          console.error("Error selecting claim:", selectionError);
+          
+          // Fallback - find the claim in our local state
+          const selectedClaim = suggestedClaims.find((c: ClaimSuggestion) => c.id?.toString() === selectedClaimId);
+          if (selectedClaim) {
+            // Update study directly instead
+            await apiRequest("PATCH", `/api/studies/${studyId}`, {
+              refinedClaim: selectedClaim.claim,
+              currentStep: 3 // Move to next step
+            });
+            
+            onNext(selectedClaim.claim);
+          } else {
+            throw new Error("Claim not found");
+          }
+        }
       } else {
         toast({
           title: "Error",
