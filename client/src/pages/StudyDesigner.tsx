@@ -225,10 +225,10 @@ export default function StudyDesigner() {
           <Card className="max-w-md mx-auto">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-red-600 mb-4">Error Loading Study</h2>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-neutral-600 mb-4">
                 We couldn't load the requested study. It may have been deleted or you may not have permission to view it.
               </p>
-              <p className="text-sm text-muted-foreground/70">
+              <p className="text-sm text-neutral-500">
                 Error details: {error instanceof Error ? error.message : 'Unknown error'}
               </p>
             </CardContent>
@@ -240,7 +240,7 @@ export default function StudyDesigner() {
   }
   
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50">
+    <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-grow">
@@ -248,7 +248,7 @@ export default function StudyDesigner() {
           {/* Page title and description */}
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-neutral-800">AI-Driven Study Designer</h1>
-            <p className="mt-2 text-neutral-600 max-w-2xl mx-auto">
+            <p className="mt-2 text-neutral-500 max-w-2xl mx-auto">
               Design IRB-ready, compliance-focused clinical studies for your wellness products in minutes.
             </p>
           </div>
@@ -271,7 +271,7 @@ export default function StudyDesigner() {
                     index + 1 === currentStep 
                       ? 'border-b-2 border-primary text-primary' 
                       : index + 1 < currentStep
-                        ? 'text-neutral-600'
+                        ? 'text-neutral-500'
                         : 'text-neutral-400'
                   }`}
                 >

@@ -3,7 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Check, Info, ArrowLeft, ArrowRight } from "lucide-react";
+import { Check, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ClaimSuggestion } from "@/lib/types";
 import { withErrorHandling, getFallbackClaims } from "@/lib/errorHandling";
@@ -160,7 +160,7 @@ export default function ClaimRefinementStep({
       ) : (
         <Info className="h-4 w-4 text-amber-500 mr-1" />
       )}
-      <span className="text-xs text-muted-foreground">{text}</span>
+      <span className="text-xs text-neutral-600">{text}</span>
     </div>
   );
   
@@ -168,33 +168,33 @@ export default function ClaimRefinementStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold text-foreground">Refine your claim</h2>
-          <p className="text-muted-foreground">Based on your input, we've identified potential scientific claims you can test.</p>
+          <h2 className="text-xl font-semibold">Refine your claim</h2>
+          <p className="text-neutral-500">Based on your input, we've identified potential scientific claims you can test.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Generated</span>
+          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Generated</span>
         </div>
       </div>
 
       {/* Original claim */}
-      <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your original input:</h3>
-        <p className="text-foreground">{originalClaim}</p>
+      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
+        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your original input:</h3>
+        <p className="text-neutral-700">{originalClaim}</p>
       </div>
 
       {/* AI-generated claim suggestions */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-foreground mb-3">Select a refined claim to test:</h3>
+        <h3 className="text-sm font-medium text-neutral-700 mb-3">Select a refined claim to test:</h3>
         
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
-                <div className="h-6 bg-muted rounded w-3/4 mb-3"></div>
+              <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
+                <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
-                  <div className="h-4 bg-muted rounded w-2/3"></div>
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -205,7 +205,7 @@ export default function ClaimRefinementStep({
               {suggestedClaims.map((claim) => (
                 <div 
                   key={claim.id} 
-                  className="ai-suggestion p-4 bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="ai-suggestion p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => setSelectedClaimId(claim.id?.toString() || "")}
                 >
                   <div className="flex items-start">
@@ -215,7 +215,7 @@ export default function ClaimRefinementStep({
                     <div className="flex-grow">
                       <Label 
                         htmlFor={`claim-${claim.id}`}
-                        className="block font-medium text-foreground cursor-pointer"
+                        className="block font-medium text-neutral-800 cursor-pointer"
                       >
                         {claim.claim}
                       </Label>
@@ -242,7 +242,7 @@ export default function ClaimRefinementStep({
               
               {/* Custom claim option */}
               <div 
-                className="p-4 bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => setSelectedClaimId("custom")}
               >
                 <div className="flex items-start">
@@ -252,7 +252,7 @@ export default function ClaimRefinementStep({
                   <div className="flex-grow">
                     <Label 
                       htmlFor="customClaim"
-                      className="block font-medium text-foreground cursor-pointer"
+                      className="block font-medium text-neutral-800 cursor-pointer"
                     >
                       Write your own claim
                     </Label>
@@ -274,14 +274,14 @@ export default function ClaimRefinementStep({
       </div>
       
       {/* Claim crafting tips */}
-      <div className="mb-6 p-4 bg-blue-950/20 border border-blue-800/30 rounded-lg">
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
         <div className="flex">
           <div className="flex-shrink-0 mr-2">
-            <Info className="h-5 w-5 text-blue-400" />
+            <Info className="h-5 w-5 text-blue-500" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-blue-300">Claim Crafting Tips</h4>
-            <p className="text-sm text-blue-400 mt-1">
+            <h4 className="text-sm font-medium text-blue-800">Claim Crafting Tips</h4>
+            <p className="text-sm text-blue-700 mt-1">
               The best scientific claims are specific, measurable, and have a reasonable basis in existing research. 
               Claims that can be measured with wearable devices generally reduce participant burden and increase data quality.
             </p>
@@ -301,7 +301,6 @@ export default function ClaimRefinementStep({
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || !selectedClaimId}
-          className="btn-primary-reputable"
         >
           {isSubmitting ? "Processing..." : "Continue to Literature Review"}
         </Button>

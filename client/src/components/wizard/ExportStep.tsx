@@ -16,8 +16,7 @@ import {
   FileSpreadsheet, 
   FileJson, 
   Check,
-  ArrowRight,
-  ArrowLeft
+  ArrowRight
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -88,8 +87,8 @@ export default function ExportStep({
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Export Protocol</h2>
-        <p className="text-muted-foreground">Your study design is complete. Export or share your protocol.</p>
+        <h2 className="text-xl font-semibold">Export Protocol</h2>
+        <p className="text-neutral-500">Your study design is complete. Export or share your protocol.</p>
       </div>
       
       <Tabs defaultValue="export" className="mb-6">
@@ -100,9 +99,9 @@ export default function ExportStep({
         </TabsList>
         
         <TabsContent value="export" className="mt-4">
-          <Card className="bg-card border-border">
+          <Card>
             <CardContent className="p-4">
-              <h3 className="text-lg font-medium text-foreground mb-4">Export Format</h3>
+              <h3 className="text-lg font-medium text-neutral-800 mb-4">Export Format</h3>
               
               <RadioGroup 
                 value={selectedFormat} 
@@ -117,12 +116,12 @@ export default function ExportStep({
                     <div>
                       <Label 
                         htmlFor="pdf"
-                        className="text-base font-medium text-foreground cursor-pointer flex items-center"
+                        className="text-base font-medium text-neutral-800 cursor-pointer flex items-center"
                       >
                         <FileText className="h-5 w-5 mr-2 text-primary" />
                         PDF Document (IRB Submission Format)
                       </Label>
-                      <p className="text-sm text-muted-foreground ml-7">Complete protocol with all sections formatted for IRB submission</p>
+                      <p className="text-sm text-neutral-500 ml-7">Complete protocol with all sections formatted for IRB submission</p>
                     </div>
                   </div>
                   
@@ -133,12 +132,12 @@ export default function ExportStep({
                     <div>
                       <Label 
                         htmlFor="docx"
-                        className="text-base font-medium text-foreground cursor-pointer flex items-center"
+                        className="text-base font-medium text-neutral-800 cursor-pointer flex items-center"
                       >
-                        <FileText className="h-5 w-5 mr-2 text-blue-400" />
+                        <FileText className="h-5 w-5 mr-2 text-blue-500" />
                         Word Document (Editable)
                       </Label>
-                      <p className="text-sm text-muted-foreground ml-7">Editable format for further customization</p>
+                      <p className="text-sm text-neutral-500 ml-7">Editable format for further customization</p>
                     </div>
                   </div>
                   
@@ -149,12 +148,12 @@ export default function ExportStep({
                     <div>
                       <Label 
                         htmlFor="xlsx"
-                        className="text-base font-medium text-foreground cursor-pointer flex items-center"
+                        className="text-base font-medium text-neutral-800 cursor-pointer flex items-center"
                       >
-                        <FileSpreadsheet className="h-5 w-5 mr-2 text-green-400" />
+                        <FileSpreadsheet className="h-5 w-5 mr-2 text-green-600" />
                         Excel Spreadsheet (Data Collection Template)
                       </Label>
-                      <p className="text-sm text-muted-foreground ml-7">Includes data collection fields for your study outcomes</p>
+                      <p className="text-sm text-neutral-500 ml-7">Includes data collection fields for your study outcomes</p>
                     </div>
                   </div>
                   
@@ -165,19 +164,19 @@ export default function ExportStep({
                     <div>
                       <Label 
                         htmlFor="json"
-                        className="text-base font-medium text-foreground cursor-pointer flex items-center"
+                        className="text-base font-medium text-neutral-800 cursor-pointer flex items-center"
                       >
-                        <FileJson className="h-5 w-5 mr-2 text-amber-400" />
+                        <FileJson className="h-5 w-5 mr-2 text-amber-500" />
                         JSON (API Format)
                       </Label>
-                      <p className="text-sm text-muted-foreground ml-7">Raw data format for integration with other systems</p>
+                      <p className="text-sm text-neutral-500 ml-7">Raw data format for integration with other systems</p>
                     </div>
                   </div>
                 </div>
               </RadioGroup>
               
-              <button 
-                className="btn-primary-reputable px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
+              <Button 
+                className="w-full md:w-auto"
                 onClick={handleExport}
                 disabled={exportLoading}
               >
@@ -185,65 +184,67 @@ export default function ExportStep({
                   "Generating file..."
                 ) : (
                   <>
-                    <Download className="h-4 w-4" />
+                    <Download className="h-4 w-4 mr-2" />
                     Export {selectedFormat.toUpperCase()}
                   </>
                 )}
-              </button>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
         
         <TabsContent value="share" className="mt-4">
-          <Card className="bg-card border-border">
+          <Card>
             <CardContent className="p-4">
-              <h3 className="text-lg font-medium text-foreground mb-4">Share Protocol</h3>
+              <h3 className="text-lg font-medium text-neutral-800 mb-4">Share Protocol</h3>
               
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground mb-2">Generate shareable link</h4>
+                  <h4 className="text-sm font-medium text-neutral-700 mb-2">Generate shareable link</h4>
                   <div className="flex">
                     <Input 
                       readOnly 
                       value={`https://reputable.io/shared-protocol/${studyId}`} 
-                      className="rounded-r-none bg-background border-border text-foreground"
+                      className="rounded-r-none"
                     />
-                    <button 
-                      className="rounded-l-none btn-outline-reputable px-3 py-1 border border-l-0 border-border flex items-center"
+                    <Button 
+                      variant="outline" 
+                      className="rounded-l-none"
                       onClick={handleCopyLink}
                     >
                       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </button>
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-neutral-500 mt-1">
                     Anyone with this link can view (but not edit) your protocol
                   </p>
                 </div>
                 
-                <Separator className="bg-border" />
+                <Separator />
                 
                 <div>
-                  <h4 className="text-sm font-medium text-foreground mb-2">Email protocol</h4>
+                  <h4 className="text-sm font-medium text-neutral-700 mb-2">Email protocol</h4>
                   <div className="flex mb-2">
                     <Input 
                       type="email"
                       placeholder="colleague@example.com" 
-                      className="rounded-r-none bg-background border-border text-foreground"
+                      className="rounded-r-none"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
-                    <button 
-                      className="rounded-l-none btn-primary-reputable px-3 py-1 flex items-center"
+                    <Button 
+                      variant="default" 
+                      className="rounded-l-none"
                       onClick={handleEmailSend}
                     >
                       {emailSent ? <Check className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
-                    </button>
+                    </Button>
                   </div>
                   <div className="flex items-center">
                     <div className="w-5 h-5 rounded-full ai-badge bubble-pulse flex items-center justify-center mr-2">
-                      <Share2 className="h-3 w-3 text-foreground" />
+                      <Share2 className="h-3 w-3 text-white" />
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-neutral-500">
                       Recipients can view and comment on your protocol
                     </p>
                   </div>
@@ -254,42 +255,42 @@ export default function ExportStep({
         </TabsContent>
         
         <TabsContent value="next-steps" className="mt-4">
-          <Card className="bg-card border-border">
+          <Card>
             <CardContent className="p-4">
-              <h3 className="text-lg font-medium text-foreground mb-4">Next Steps with Reputable</h3>
+              <h3 className="text-lg font-medium text-neutral-800 mb-4">Next Steps with Reputable</h3>
               
               <div className="space-y-6">
-                <div className="p-4 border border-primary/20 bg-primary/10 rounded-lg">
+                <div className="p-4 border border-primary/20 bg-primary/5 rounded-lg">
                   <h4 className="font-medium flex items-center text-primary mb-2">
                     <ArrowRight className="h-5 w-5 mr-2" />
                     Run your study with Reputable
                   </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
+                  <p className="text-sm text-neutral-600 mb-3">
                     Take your protocol from design to execution. Our platform handles participant recruitment, compliance tracking, data collection, and analysis.
                   </p>
-                  <button className="btn-primary-reputable px-4 py-2 rounded">
+                  <Button>
                     Get Started with Study Execution
-                  </button>
+                  </Button>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-3 border border-border rounded-lg bg-background/60">
-                    <h4 className="text-sm font-medium text-foreground mb-1">Recruit Participants</h4>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="p-3 border border-neutral-200 rounded-lg">
+                    <h4 className="text-sm font-medium text-neutral-700 mb-1">Recruit Participants</h4>
+                    <p className="text-xs text-neutral-500">
                       Access our diverse participant pool or bring your own customers
                     </p>
                   </div>
                   
-                  <div className="p-3 border border-border rounded-lg bg-background/60">
-                    <h4 className="text-sm font-medium text-foreground mb-1">Track Compliance</h4>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="p-3 border border-neutral-200 rounded-lg">
+                    <h4 className="text-sm font-medium text-neutral-700 mb-1">Track Compliance</h4>
+                    <p className="text-xs text-neutral-500">
                       Automated tools to ensure protocol adherence and data quality
                     </p>
                   </div>
                   
-                  <div className="p-3 border border-border rounded-lg bg-background/60">
-                    <h4 className="text-sm font-medium text-foreground mb-1">Analyze Results</h4>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="p-3 border border-neutral-200 rounded-lg">
+                    <h4 className="text-sm font-medium text-neutral-700 mb-1">Analyze Results</h4>
+                    <p className="text-xs text-neutral-500">
                       Statistical analysis and visualization of your study outcomes
                     </p>
                   </div>
@@ -297,9 +298,9 @@ export default function ExportStep({
                 
                 <div className="text-center">
                   <Link href="/">
-                    <button className="btn-outline-reputable px-4 py-2 rounded">
+                    <Button variant="outline">
                       Return to Dashboard
-                    </button>
+                    </Button>
                   </Link>
                 </div>
               </div>
@@ -310,18 +311,16 @@ export default function ExportStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <button 
-          className="btn-outline-reputable px-4 py-2 rounded flex items-center gap-2"
+        <Button 
+          variant="outline" 
           onClick={onBack}
         >
-          <ArrowLeft className="h-4 w-4" />
           Back
-        </button>
+        </Button>
         <Link href="/">
-          <button className="btn-primary-reputable px-4 py-2 rounded flex items-center gap-2">
+          <Button>
             Finish
-            <Check className="h-4 w-4" />
-          </button>
+          </Button>
         </Link>
       </div>
     </div>

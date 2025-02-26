@@ -41,18 +41,18 @@ export default function Home() {
   
   const renderEmptyState = () => (
     <div className="text-center py-12">
-      <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
         <Beaker className="h-8 w-8 text-primary" />
       </div>
-      <h3 className="text-lg font-medium text-foreground mb-2">No studies yet</h3>
-      <p className="text-muted-foreground max-w-md mx-auto mb-6">
+      <h3 className="text-lg font-medium text-neutral-800 mb-2">No studies yet</h3>
+      <p className="text-neutral-500 max-w-md mx-auto mb-6">
         Design your first IRB-ready clinical study in minutes with our AI-powered wizard.
       </p>
       <Link href="/study-designer">
-        <button className="btn-reputable px-4 py-2 rounded flex items-center justify-center mx-auto">
+        <Button>
           <PlusCircle className="h-4 w-4 mr-2" />
           Create Your First Study
-        </button>
+        </Button>
       </Link>
     </div>
   );
@@ -89,86 +89,86 @@ export default function Home() {
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Hero section */}
-          <div className="mb-12 px-4 py-10 bg-card rounded-xl shadow-sm border border-border">
+          <div className="mb-12 px-4 py-10 bg-white rounded-xl shadow-sm border border-neutral-100">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">
                 AI-Driven Scientific Studies for Wellness Brands
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
+              <p className="text-xl text-neutral-500 mb-8">
                 Design IRB-ready, compliance-focused clinical studies for your wellness products in minutes.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link href="/study-designer">
-                  <button className="btn-reputable w-full sm:w-auto px-6 py-3 flex items-center justify-center text-base font-medium rounded">
+                  <Button size="lg" className="w-full sm:w-auto">
                     <Beaker className="h-5 w-5 mr-2" />
                     Design a New Study
-                  </button>
+                  </Button>
                 </Link>
-                <button className="btn-outline-reputable w-full sm:w-auto px-6 py-3 flex items-center justify-center text-base font-medium rounded">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto">
                   <FileText className="h-5 w-5 mr-2" />
                   View Sample Study
-                </button>
+                </Button>
               </div>
             </div>
           </div>
           
           {/* Feature highlights */}
           <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="card-reputable">
-              <div className="p-6">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Beaker className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">AI-Powered Design</h3>
-                <p className="text-muted-foreground mb-4">
+                <h3 className="text-lg font-medium text-neutral-800 mb-2">AI-Powered Design</h3>
+                <p className="text-neutral-500 mb-4">
                   Our AI generates scientifically valid claims, recommends outcome measures, and suggests optimal study designs.
                 </p>
-                <button className="p-0 h-auto text-primary flex items-center hover:brightness-110">
+                <Button variant="link" className="p-0 h-auto text-primary flex items-center">
                   Learn More <ArrowRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
             
-            <div className="card-reputable">
-              <div className="p-6">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">IRB-Ready Protocols</h3>
-                <p className="text-muted-foreground mb-4">
+                <h3 className="text-lg font-medium text-neutral-800 mb-2">IRB-Ready Protocols</h3>
+                <p className="text-neutral-500 mb-4">
                   Generate complete study protocols that meet IRB submission requirements and comply with regulatory standards.
                 </p>
-                <button className="p-0 h-auto text-primary flex items-center hover:brightness-110">
+                <Button variant="link" className="p-0 h-auto text-primary flex items-center">
                   Learn More <ArrowRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
             
-            <div className="card-reputable">
-              <div className="p-6">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <TrendingUp className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Evidence-Based Results</h3>
-                <p className="text-muted-foreground mb-4">
+                <h3 className="text-lg font-medium text-neutral-800 mb-2">Evidence-Based Results</h3>
+                <p className="text-neutral-500 mb-4">
                   Create scientific evidence for your product claims with studies that follow rigorous methodologies.
                 </p>
-                <button className="p-0 h-auto text-primary flex items-center hover:brightness-110">
+                <Button variant="link" className="p-0 h-auto text-primary flex items-center">
                   Learn More <ArrowRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
           
           {/* Studies section */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground">Your Studies</h2>
+              <h2 className="text-2xl font-bold text-neutral-800">Your Studies</h2>
               <Link href="/study-designer">
-                <button className="btn-reputable flex items-center px-3 py-2 rounded text-sm font-medium">
+                <Button>
                   <PlusCircle className="h-4 w-4 mr-2" />
                   New Study
-                </button>
+                </Button>
               </Link>
             </div>
             
@@ -185,19 +185,19 @@ export default function Home() {
                 ) : (
                   <div className="space-y-4">
                     {studies.map((study) => (
-                      <div key={study.id} className="card-reputable hover:border-primary/50 transition-all">
-                        <div className="p-4">
+                      <Card key={study.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
                           <div className="flex flex-col md:flex-row md:items-center justify-between">
                             <div className="mb-4 md:mb-0">
-                              <h3 className="font-medium text-lg text-foreground">{study.productName}</h3>
+                              <h3 className="font-medium text-lg text-neutral-800">{study.productName}</h3>
                               {study.refinedClaim ? (
-                                <p className="text-sm text-muted-foreground mt-1">{study.refinedClaim}</p>
+                                <p className="text-sm text-neutral-600 mt-1">{study.refinedClaim}</p>
                               ) : (
-                                <p className="text-sm text-muted-foreground/60 italic mt-1">No claim defined yet</p>
+                                <p className="text-sm text-neutral-400 italic mt-1">No claim defined yet</p>
                               )}
                               <div className="flex items-center mt-2">
-                                <span className="text-xs text-muted-foreground">Created {formatDate(study.createdAt)}</span>
-                                <span className="mx-2 text-muted-foreground/50">•</span>
+                                <span className="text-xs text-neutral-500">Created {formatDate(study.createdAt)}</span>
+                                <span className="mx-2 text-neutral-300">•</span>
                                 <span className="text-xs flex items-center">
                                   <span className={`w-2 h-2 rounded-full mr-1 ${
                                     study.currentStep === 7 ? 'bg-green-500' : 'bg-amber-500'
@@ -208,20 +208,20 @@ export default function Home() {
                             </div>
                             <div className="flex space-x-2">
                               <Link href={`/study-designer/${study.id}`}>
-                                <button className="btn-outline-reputable px-3 py-1.5 rounded text-sm">
+                                <Button variant="outline" size="sm">
                                   {study.currentStep === 7 ? 'View Study' : 'Continue'}
-                                </button>
+                                </Button>
                               </Link>
                               {study.currentStep === 7 && (
-                                <button className="btn-reputable px-3 py-1.5 rounded text-sm flex items-center">
+                                <Button size="sm">
                                   <FileText className="h-4 w-4 mr-2" />
                                   Export
-                                </button>
+                                </Button>
                               )}
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 )}
@@ -231,23 +231,23 @@ export default function Home() {
                 <div className="space-y-4">
                   {studies.filter(s => s.currentStep < 7).length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-muted-foreground">No draft studies found.</p>
+                      <p className="text-neutral-500">No draft studies found.</p>
                     </div>
                   ) : (
                     studies.filter(s => s.currentStep < 7).map((study) => (
-                      <div key={study.id} className="card-reputable hover:border-primary/50 transition-all">
-                        <div className="p-4">
+                      <Card key={study.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
                           <div className="flex flex-col md:flex-row md:items-center justify-between">
                             <div className="mb-4 md:mb-0">
-                              <h3 className="font-medium text-lg text-foreground">{study.productName}</h3>
+                              <h3 className="font-medium text-lg text-neutral-800">{study.productName}</h3>
                               {study.refinedClaim ? (
-                                <p className="text-sm text-muted-foreground mt-1">{study.refinedClaim}</p>
+                                <p className="text-sm text-neutral-600 mt-1">{study.refinedClaim}</p>
                               ) : (
-                                <p className="text-sm text-muted-foreground/60 italic mt-1">No claim defined yet</p>
+                                <p className="text-sm text-neutral-400 italic mt-1">No claim defined yet</p>
                               )}
                               <div className="flex items-center mt-2">
-                                <span className="text-xs text-muted-foreground">Created {formatDate(study.createdAt)}</span>
-                                <span className="mx-2 text-muted-foreground/50">•</span>
+                                <span className="text-xs text-neutral-500">Created {formatDate(study.createdAt)}</span>
+                                <span className="mx-2 text-neutral-300">•</span>
                                 <span className="text-xs flex items-center">
                                   <span className="w-2 h-2 rounded-full bg-amber-500 mr-1"></span>
                                   Step {study.currentStep}: {getStepName(study.currentStep)}
@@ -255,13 +255,13 @@ export default function Home() {
                               </div>
                             </div>
                             <Link href={`/study-designer/${study.id}`}>
-                              <button className="btn-outline-reputable px-3 py-1.5 rounded text-sm">
+                              <Button variant="outline" size="sm">
                                 Continue
-                              </button>
+                              </Button>
                             </Link>
                           </div>
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     ))
                   )}
                 </div>
@@ -271,19 +271,19 @@ export default function Home() {
                 <div className="space-y-4">
                   {studies.filter(s => s.currentStep === 7).length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-muted-foreground">No completed studies found.</p>
+                      <p className="text-neutral-500">No completed studies found.</p>
                     </div>
                   ) : (
                     studies.filter(s => s.currentStep === 7).map((study) => (
-                      <div key={study.id} className="card-reputable hover:border-primary/50 transition-all">
-                        <div className="p-4">
+                      <Card key={study.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
                           <div className="flex flex-col md:flex-row md:items-center justify-between">
                             <div className="mb-4 md:mb-0">
-                              <h3 className="font-medium text-lg text-foreground">{study.productName}</h3>
-                              <p className="text-sm text-muted-foreground mt-1">{study.refinedClaim}</p>
+                              <h3 className="font-medium text-lg text-neutral-800">{study.productName}</h3>
+                              <p className="text-sm text-neutral-600 mt-1">{study.refinedClaim}</p>
                               <div className="flex items-center mt-2">
-                                <span className="text-xs text-muted-foreground">Created {formatDate(study.createdAt)}</span>
-                                <span className="mx-2 text-muted-foreground/50">•</span>
+                                <span className="text-xs text-neutral-500">Created {formatDate(study.createdAt)}</span>
+                                <span className="mx-2 text-neutral-300">•</span>
                                 <span className="text-xs flex items-center">
                                   <span className="w-2 h-2 rounded-full bg-green-500 mr-1"></span>
                                   Complete
@@ -292,18 +292,18 @@ export default function Home() {
                             </div>
                             <div className="flex space-x-2">
                               <Link href={`/study-designer/${study.id}`}>
-                                <button className="btn-outline-reputable px-3 py-1.5 rounded text-sm">
+                                <Button variant="outline" size="sm">
                                   View Study
-                                </button>
+                                </Button>
                               </Link>
-                              <button className="btn-reputable px-3 py-1.5 rounded text-sm flex items-center">
+                              <Button size="sm">
                                 <FileText className="h-4 w-4 mr-2" />
                                 Export
-                              </button>
+                              </Button>
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     ))
                   )}
                 </div>
@@ -312,21 +312,21 @@ export default function Home() {
           </div>
           
           {/* CTA section */}
-          <div className="bg-primary rounded-xl p-8 text-primary-foreground">
+          <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-8 text-white">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-2xl font-bold mb-4">Ready to Execute Your Study?</h2>
               <p className="mb-6">
                 Take your protocol from design to execution. Our platform handles participant recruitment, compliance tracking, and data analysis.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <button className="bg-background text-foreground hover:bg-muted px-6 py-3 rounded flex items-center justify-center text-base font-medium">
+                <Button variant="secondary" size="lg" className="bg-white text-primary hover:bg-neutral-100">
                   <Users className="h-5 w-5 mr-2" />
                   Recruit Participants
-                </button>
-                <button className="border border-background text-background hover:bg-primary/90 px-6 py-3 rounded flex items-center justify-center text-base font-medium">
+                </Button>
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
                   <BarChart3 className="h-5 w-5 mr-2" />
                   Learn About Analysis
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -336,20 +336,20 @@ export default function Home() {
       <Footer />
       
       {/* Developer Test Mode Toggle */}
-      <div className="fixed bottom-4 right-4 bg-background p-2 rounded-lg shadow-md border border-border flex items-center space-x-2">
+      <div className="fixed bottom-4 right-4 bg-white p-2 rounded-lg shadow-md border border-neutral-200 flex items-center space-x-2">
         <div className="flex items-center space-x-2">
           <Switch 
             id="test-mode" 
             checked={isTestMode} 
             onCheckedChange={handleTestModeToggle}
           />
-          <Label htmlFor="test-mode" className="text-xs flex items-center text-foreground">
-            <FlaskConical className="h-4 w-4 mr-1 text-primary" />
+          <Label htmlFor="test-mode" className="text-xs flex items-center">
+            <FlaskConical className="h-4 w-4 mr-1 text-amber-500" />
             Test Mode
           </Label>
         </div>
         {isTestMode && (
-          <span className="bg-primary/20 text-primary text-xs rounded px-1 py-0.5">ON</span>
+          <span className="bg-amber-100 text-amber-800 text-xs rounded px-1 py-0.5">ON</span>
         )}
       </div>
     </div>

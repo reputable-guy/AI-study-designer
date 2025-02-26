@@ -194,18 +194,18 @@ export default function LiteratureReviewStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold text-foreground">Literature Review</h2>
-          <p className="text-muted-foreground">We've analyzed scientific evidence related to your claim.</p>
+          <h2 className="text-xl font-semibold">Literature Review</h2>
+          <p className="text-neutral-500">We've analyzed scientific evidence related to your claim.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Powered</span>
+          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Powered</span>
         </div>
       </div>
 
       {/* Selected claim display */}
-      <div className="mb-6 p-4 bg-card border border-border rounded-lg">
-        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your selected claim:</h3>
-        <p className="text-foreground font-medium">{refinedClaim}</p>
+      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
+        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your selected claim:</h3>
+        <p className="text-neutral-800 font-medium">{refinedClaim}</p>
       </div>
 
       {/* Search and filter controls */}
@@ -214,11 +214,11 @@ export default function LiteratureReviewStep({
           <div className="flex-grow">
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <Search className="h-5 w-5 text-muted-foreground" />
+                <Search className="h-5 w-5 text-neutral-400" />
               </span>
               <Input
                 type="text"
-                className="pl-10 bg-card border-border"
+                className="pl-10"
                 placeholder="Search the literature..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -226,61 +226,57 @@ export default function LiteratureReviewStep({
             </div>
           </div>
           <div className="flex space-x-2 overflow-x-auto pb-2 md:pb-0">
-            <button
-              className={`px-3 py-1.5 text-sm rounded whitespace-nowrap ${
-                activeFilter === "All Studies" 
-                  ? "btn-reputable" 
-                  : "btn-outline-reputable"
-              }`}
+            <Button
+              variant={activeFilter === "All Studies" ? "default" : "outline"}
+              size="sm"
+              className="whitespace-nowrap"
               onClick={() => applyFilter("All Studies")}
             >
-              All Studies <ChevronDown className="ml-1 h-4 w-4 inline" />
-            </button>
-            <button
-              className={`px-3 py-1.5 text-sm rounded whitespace-nowrap ${
-                activeFilter === "Humans Only" 
-                  ? "btn-reputable" 
-                  : "btn-outline-reputable"
-              }`}
+              All Studies <ChevronDown className="ml-1 h-4 w-4" />
+            </Button>
+            <Button
+              variant={activeFilter === "Humans Only" ? "default" : "outline"}
+              size="sm"
+              className="whitespace-nowrap"
               onClick={() => applyFilter("Humans Only")}
             >
-              Humans Only <ChevronDown className="ml-1 h-4 w-4 inline" />
-            </button>
-            <button
-              className={`px-3 py-1.5 text-sm rounded whitespace-nowrap ${
-                activeFilter === "High Evidence" 
-                  ? "btn-reputable" 
-                  : "btn-outline-reputable"
-              }`}
+              Humans Only <ChevronDown className="ml-1 h-4 w-4" />
+            </Button>
+            <Button
+              variant={activeFilter === "High Evidence" ? "default" : "outline"}
+              size="sm"
+              className="whitespace-nowrap"
               onClick={() => applyFilter("High Evidence")}
             >
-              High Evidence <ChevronDown className="ml-1 h-4 w-4 inline" />
-            </button>
+              High Evidence <ChevronDown className="ml-1 h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         {/* AI Query Assistant */}
-        <div className="mt-4 flex items-center border border-border rounded-md p-2 bg-card">
-          <div className="text-primary mx-2">
+        <div className="mt-4 flex items-center border border-neutral-200 rounded-md p-2 bg-neutral-50">
+          <div className="text-primary-500 mx-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </div>
           <Input
             type="text"
-            className="flex-grow border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
+            className="flex-grow border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
             placeholder="Ask AI a question about the literature (e.g., 'Did any studies measure REM sleep in women?')"
             value={aiQuery}
             onChange={(e) => setAiQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAiQuery()}
           />
-          <button 
-            className="text-primary px-2 py-1 text-sm rounded"
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-primary-500"
             onClick={handleAiQuery}
             disabled={isAiProcessing || !aiQuery.trim()}
           >
             {isAiProcessing ? "Processing..." : "Ask"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -288,17 +284,17 @@ export default function LiteratureReviewStep({
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
+            <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
               <div className="flex justify-between">
-                <div className="h-6 bg-muted rounded w-2/3 mb-2"></div>
-                <div className="h-6 bg-muted rounded w-24"></div>
+                <div className="h-6 bg-neutral-200 rounded w-2/3 mb-2"></div>
+                <div className="h-6 bg-neutral-200 rounded w-24"></div>
               </div>
-              <div className="h-4 bg-muted rounded w-1/2 mb-3"></div>
+              <div className="h-4 bg-neutral-200 rounded w-1/2 mb-3"></div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="h-16 bg-muted rounded"></div>
-                <div className="h-16 bg-muted rounded"></div>
-                <div className="h-16 bg-muted rounded"></div>
-                <div className="h-16 bg-muted rounded"></div>
+                <div className="h-16 bg-neutral-200 rounded"></div>
+                <div className="h-16 bg-neutral-200 rounded"></div>
+                <div className="h-16 bg-neutral-200 rounded"></div>
+                <div className="h-16 bg-neutral-200 rounded"></div>
               </div>
             </div>
           ))}
@@ -307,53 +303,55 @@ export default function LiteratureReviewStep({
         <div className="space-y-4">
           {filteredStudies.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">No studies found matching your search criteria.</p>
+              <p className="text-neutral-500">No studies found matching your search criteria.</p>
             </div>
           ) : (
             filteredStudies.map((study) => (
-              <div 
+              <Card 
                 key={study.id} 
-                className={`${getEvidenceClass(study.evidenceGrade)} border-l-[3px] card-reputable shadow-sm hover:shadow-md transition-shadow`}
+                className={`${getEvidenceClass(study.evidenceGrade)} border-l-[3px] shadow-sm hover:shadow-md transition-shadow`}
               >
-                <div className="p-4">
+                <CardContent className="p-4">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-medium text-foreground">{study.title}</h3>
+                    <h3 className="font-medium text-neutral-800">{study.title}</h3>
                     <div 
                       className={`ml-2 px-2 py-0.5 rounded text-xs font-medium ${
                         study.evidenceGrade === "High" 
-                          ? "bg-green-100/20 text-green-500" 
+                          ? "bg-green-100 text-green-600" 
                           : study.evidenceGrade === "Moderate"
-                            ? "bg-orange-100/20 text-orange-500"
-                            : "bg-red-100/20 text-red-500"
+                            ? "bg-orange-100 text-orange-600"
+                            : "bg-red-100 text-red-600"
                       }`}
                     >
                       {study.evidenceGrade} Evidence
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">{study.authors} {study.journal} ({study.year})</p>
+                  <p className="text-sm text-neutral-600 mt-1">{study.authors} {study.journal} ({study.year})</p>
                   
                   <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="bg-background/50 p-2 rounded border border-border">
-                      <p className="text-xs text-muted-foreground">Sample Size</p>
-                      <p className="text-sm font-medium text-foreground">{study.sampleSize} participants</p>
+                    <div className="bg-neutral-50 p-2 rounded">
+                      <p className="text-xs text-neutral-500">Sample Size</p>
+                      <p className="text-sm font-medium">{study.sampleSize} participants</p>
                     </div>
-                    <div className="bg-background/50 p-2 rounded border border-border">
-                      <p className="text-xs text-muted-foreground">Effect Size</p>
-                      <p className="text-sm font-medium text-foreground">{study.effectSize}</p>
+                    <div className="bg-neutral-50 p-2 rounded">
+                      <p className="text-xs text-neutral-500">Effect Size</p>
+                      <p className="text-sm font-medium">{study.effectSize}</p>
                     </div>
-                    <div className="bg-background/50 p-2 rounded border border-border">
-                      <p className="text-xs text-muted-foreground">Dosage</p>
-                      <p className="text-sm font-medium text-foreground">{study.dosage}</p>
+                    <div className="bg-neutral-50 p-2 rounded">
+                      <p className="text-xs text-neutral-500">Dosage</p>
+                      <p className="text-sm font-medium">{study.dosage}</p>
                     </div>
-                    <div className="bg-background/50 p-2 rounded border border-border">
-                      <p className="text-xs text-muted-foreground">Duration</p>
-                      <p className="text-sm font-medium text-foreground">{study.duration}</p>
+                    <div className="bg-neutral-50 p-2 rounded">
+                      <p className="text-xs text-neutral-500">Duration</p>
+                      <p className="text-sm font-medium">{study.duration}</p>
                     </div>
                   </div>
                   
                   <div className="mt-3">
-                    <button
-                      className="text-primary p-0 h-auto text-sm font-medium flex items-center hover:brightness-110"
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-primary-500 p-0 h-auto font-medium"
                       onClick={() => toggleStudyDetails(study.id || 0)}
                     >
                       {expandedStudyId === study.id ? "Hide details" : "Show details"}
@@ -362,18 +360,18 @@ export default function LiteratureReviewStep({
                       ) : (
                         <ChevronDown className="ml-1 h-4 w-4" />
                       )}
-                    </button>
+                    </Button>
                     
                     {expandedStudyId === study.id && (
-                      <div className="mt-3 text-sm text-muted-foreground">
+                      <div className="mt-3 text-sm text-neutral-600">
                         <p>{study.summary}</p>
                         {study.details && <p className="mt-2">{study.details}</p>}
                         {!study.details && <p className="mt-2">No additional details available for this study.</p>}
                       </div>
                     )}
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))
           )}
         </div>
@@ -381,18 +379,15 @@ export default function LiteratureReviewStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <button 
-          className="btn-outline-reputable px-4 py-2 rounded"
+        <Button 
+          variant="outline" 
           onClick={onBack}
         >
           Back
-        </button>
-        <button 
-          className="btn-reputable px-4 py-2 rounded"
-          onClick={onNext}
-        >
+        </Button>
+        <Button onClick={onNext}>
           Continue to Outcome Selection
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -210,12 +210,12 @@ export default function StudyDesignStep({
   if (isLoading || !studyDesign) {
     return (
       <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4 text-foreground">Study Design</h2>
+        <h2 className="text-xl font-semibold mb-4">Study Design</h2>
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
-              <div className="h-6 bg-muted rounded w-1/3 mb-3"></div>
-              <div className="h-24 bg-muted rounded w-full mb-2"></div>
+            <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
+              <div className="h-6 bg-neutral-200 rounded w-1/3 mb-3"></div>
+              <div className="h-24 bg-neutral-200 rounded w-full mb-2"></div>
             </div>
           ))}
         </div>
@@ -227,43 +227,43 @@ export default function StudyDesignStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold text-foreground">Study Design</h2>
-          <p className="text-muted-foreground">We've designed an optimal study to test your claim.</p>
+          <h2 className="text-xl font-semibold">Study Design</h2>
+          <p className="text-neutral-500">We've designed an optimal study to test your claim.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Optimized</span>
+          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Optimized</span>
         </div>
       </div>
 
       {/* Selected claim display */}
-      <div className="mb-6 p-4 bg-card border border-border rounded-lg">
-        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your selected claim:</h3>
-        <p className="text-foreground font-medium">{refinedClaim}</p>
+      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
+        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your selected claim:</h3>
+        <p className="text-neutral-800 font-medium">{refinedClaim}</p>
       </div>
       
       <div className="space-y-6">
         {/* Study type */}
-        <Card className="bg-card border-border">
+        <Card>
           <CardContent className="p-4">
-            <h3 className="font-medium text-lg text-foreground mb-2">Recommended Study Design</h3>
-            <p className="text-muted-foreground mb-4">Based on your claim and selected outcome measures, we recommend:</p>
+            <h3 className="font-medium text-lg text-neutral-800 mb-2">Recommended Study Design</h3>
+            <p className="text-neutral-600 mb-4">Based on your claim and selected outcome measures, we recommend:</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-background border border-border p-3 rounded-md">
-                <span className="text-sm text-muted-foreground">Study Type:</span>
-                <p className="font-medium text-foreground">{studyDesign.type}</p>
+              <div className="bg-neutral-50 p-3 rounded-md">
+                <span className="text-sm text-neutral-500">Study Type:</span>
+                <p className="font-medium">{studyDesign.type}</p>
               </div>
-              <div className="bg-background border border-border p-3 rounded-md">
-                <span className="text-sm text-muted-foreground">Duration:</span>
-                <p className="font-medium text-foreground">{studyDesign.duration}</p>
+              <div className="bg-neutral-50 p-3 rounded-md">
+                <span className="text-sm text-neutral-500">Duration:</span>
+                <p className="font-medium">{studyDesign.duration}</p>
               </div>
-              <div className="bg-background border border-border p-3 rounded-md">
-                <span className="text-sm text-muted-foreground">Blinding:</span>
-                <p className="font-medium text-foreground">{studyDesign.blindingType}</p>
+              <div className="bg-neutral-50 p-3 rounded-md">
+                <span className="text-sm text-neutral-500">Blinding:</span>
+                <p className="font-medium">{studyDesign.blindingType}</p>
               </div>
-              <div className="bg-background border border-border p-3 rounded-md">
-                <span className="text-sm text-muted-foreground">Control:</span>
-                <p className="font-medium text-foreground">{studyDesign.controlType}</p>
+              <div className="bg-neutral-50 p-3 rounded-md">
+                <span className="text-sm text-neutral-500">Control:</span>
+                <p className="font-medium">{studyDesign.controlType}</p>
               </div>
             </div>
           </CardContent>
@@ -273,7 +273,7 @@ export default function StudyDesignStep({
         <Card>
           <CardContent className="p-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-medium text-lg text-foreground mb-2">Sample Size</h3>
+              <h3 className="font-medium text-lg text-neutral-800 mb-2">Sample Size</h3>
               
               {/* Educational Module Dialog */}
               <Dialog>
@@ -350,7 +350,7 @@ export default function StudyDesignStep({
                         For your study on {refinedClaim.toLowerCase()}, we've calculated the sample size based on:
                       </p>
                       
-                      <div className="bg-card p-4 rounded-md mb-4 border border-border">
+                      <div className="bg-neutral-50 p-4 rounded-md mb-4">
                         <ul className="space-y-3">
                           <li className="flex items-start">
                             <div className="bg-blue-100 rounded-full p-1 mr-2 flex-shrink-0">
@@ -386,10 +386,10 @@ export default function StudyDesignStep({
                       <p className="mb-3">
                         For a two-sample t-test (common in clinical trials), the simplified formula is:
                       </p>
-                      <div className="bg-muted p-3 rounded-md mb-4 text-center font-mono">
+                      <div className="bg-neutral-100 p-3 rounded-md mb-4 text-center font-mono">
                         n = 2 × (Zα + Zβ)² × σ² ÷ d²
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">
+                      <p className="text-sm text-neutral-600 mb-3">
                         Where <em>n</em> is sample size per group, <em>Zα</em> and <em>Zβ</em> are standard normal deviates for α and β,
                         <em>σ</em> is the standard deviation, and <em>d</em> is the expected difference between groups.
                       </p>
@@ -588,7 +588,7 @@ export default function StudyDesignStep({
         <Card>
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium text-lg text-foreground">Participant Criteria</h3>
+              <h3 className="font-medium text-lg text-neutral-800">Participant Criteria</h3>
               <Button
                 variant="outline" 
                 size="sm" 
@@ -868,11 +868,11 @@ export default function StudyDesignStep({
         <Card className="opacity-60">
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium text-lg text-foreground">Advanced Design Options</h3>
+              <h3 className="font-medium text-lg text-neutral-800">Advanced Design Options</h3>
               <span className="text-xs bg-neutral-200 text-neutral-600 px-2 py-1 rounded">Coming Soon</span>
             </div>
             
-            <p className="text-sm text-muted-foreground mb-4">These advanced study design options will be available in a future release.</p>
+            <p className="text-sm text-neutral-600 mb-4">These advanced study design options will be available in a future release.</p>
             
             <div className="space-y-3">
               <div className="flex items-center">
@@ -900,20 +900,19 @@ export default function StudyDesignStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <button 
-          className="btn-outline-reputable px-4 py-2 rounded"
+        <Button 
+          variant="outline" 
           onClick={onBack}
           disabled={isSubmitting}
         >
           Back
-        </button>
-        <button 
-          className="btn-reputable px-4 py-2 rounded"
+        </Button>
+        <Button 
           onClick={handleSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Processing..." : "Generate Protocol"}
-        </button>
+        </Button>
       </div>
     </div>
   );
