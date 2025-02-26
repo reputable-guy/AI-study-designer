@@ -258,3 +258,80 @@ export async function assessRegulatory(claim: string): Promise<any> {
     throw error;
   }
 }
+
+/**
+ * Check protocol for regulatory compliance with FDA/FTC guidelines
+ * @param protocol The protocol to check
+ * @param claim The claim being tested
+ */
+export async function checkProtocolCompliance(protocol: any, claim: string): Promise<any> {
+  try {
+    // In a real implementation, this would call the backend
+    // For now, we'll simulate the API response directly
+    
+    // Create a protocol summary for the compliance check
+    const protocolSummary = {
+      title: protocol.title,
+      claim: claim,
+      sections: protocol.sections.map((section: any) => ({
+        title: section.title,
+        content: section.content
+      }))
+    };
+    
+    // Check for common compliance issues in the protocol
+    const issues = [];
+    const protocolText = JSON.stringify(protocolSummary);
+    
+    // Check for potentially problematic terms
+    if (protocolText.toLowerCase().includes("cure") || 
+        protocolText.toLowerCase().includes("treat") ||
+        protocolText.toLowerCase().includes("prevent disease")) {
+      issues.push({
+        section: "Multiple sections",
+        issue: "Disease claim language detected",
+        recommendation: "Replace disease claim language with structure/function language. Avoid terms like 'cure', 'treat', or 'prevent disease'.",
+        severity: 'high'
+      });
+    }
+    
+    // Check for missing informed consent
+    if (!protocolText.toLowerCase().includes("informed consent")) {
+      issues.push({
+        section: "Informed Consent",
+        issue: "Missing or inadequate informed consent procedures",
+        recommendation: "Add detailed informed consent procedures, including participant rights, study risks, and data privacy information.",
+        severity: 'high'
+      });
+    }
+    
+    // Check for adequate safety monitoring
+    if (!protocolText.toLowerCase().includes("adverse event") && 
+        !protocolText.toLowerCase().includes("safety monitoring")) {
+      issues.push({
+        section: "Safety Monitoring",
+        issue: "Inadequate safety monitoring procedures",
+        recommendation: "Add comprehensive safety monitoring and adverse event reporting procedures.",
+        severity: 'medium'
+      });
+    }
+    
+    // Return the compliance results
+    return {
+      isCompliant: issues.length === 0,
+      issues: issues
+    };
+  } catch (error) {
+    console.error("Error checking protocol compliance:", error);
+    // Return a fallback response indicating an error
+    return {
+      isCompliant: false,
+      issues: [{
+        section: "General",
+        issue: "Error evaluating compliance",
+        recommendation: "An error occurred while evaluating compliance. Please try again.",
+        severity: 'medium'
+      }]
+    };
+  }
+}

@@ -2,10 +2,20 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { 
+  Dialog,
+  DialogContent, 
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { generateProtocol } from "@/lib/openai";
+import { generateProtocol, assessRegulatory, checkProtocolCompliance } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
-import { Check, FileText, AlertCircle, Loader2 } from "lucide-react";
+import { Check, FileText, AlertCircle, Loader2, Edit, RefreshCw, Save, XCircle, ShieldCheck, Shield } from "lucide-react";
 import { useTestMode } from "@/lib/TestModeContext";
 
 interface ProtocolSection {
@@ -13,11 +23,22 @@ interface ProtocolSection {
   content: string;
 }
 
+interface ComplianceIssue {
+  section: string;
+  issue: string;
+  recommendation: string;
+  severity: 'high' | 'medium' | 'low';
+}
+
 interface Protocol {
   title: string;
   version: string;
   date: string;
   sections: ProtocolSection[];
+  complianceStatus?: {
+    isCompliant: boolean;
+    issues?: ComplianceIssue[];
+  };
 }
 
 interface ProtocolGenerationStepProps {
@@ -39,8 +60,12 @@ export default function ProtocolGenerationStep({
 }: ProtocolGenerationStepProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isCheckingCompliance, setIsCheckingCompliance] = useState(false);
   const [protocol, setProtocol] = useState<Protocol | null>(null);
+  const [editingProtocol, setEditingProtocol] = useState<Protocol | null>(null);
+  const [editingSectionIndex, setEditingSectionIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [showCompliance, setShowCompliance] = useState(false);
   const { toast } = useToast();
   const { isTestMode } = useTestMode();
   
@@ -135,9 +160,104 @@ export default function ProtocolGenerationStep({
     
     fetchProtocol();
   }, [studyId, refinedClaim, studyDesign, outcomeMeasures, toast, isTestMode]);
-  
-  const handleContinue = () => {
+  // Initialize editingProtocol when protocol changes
+  useEffect(() => {
     if (protocol) {
+      setEditingProtocol(JSON.parse(JSON.stringify(protocol)));
+    }
+  }, [protocol]);
+  
+  // Function to handle initiating section edit
+  const handleEditSection = (index: number) => {
+    setEditingSectionIndex(index);
+  };
+  
+  // Function to handle saving edited section
+  const handleSaveSection = async () => {
+    if (editingProtocol && editingSectionIndex !== null && protocol) {
+      // Create a new protocol object with the edited section
+      const updatedProtocol = {
+        ...protocol,
+        sections: [...protocol.sections]
+      };
+      
+      // Update the specific section
+      updatedProtocol.sections[editingSectionIndex] = editingProtocol.sections[editingSectionIndex];
+      
+      // Clear editing state
+      setEditingSectionIndex(null);
+      
+      // Save the updated protocol
+      setProtocol(updatedProtocol);
+      
+      // Check compliance after editing
+      await checkCompliance(updatedProtocol);
+      
+      toast({
+        title: "Section Updated",
+        description: "Protocol section has been updated.",
+        variant: "default",
+      });
+    }
+  };
+  
+  // Function to cancel editing
+  const handleCancelEdit = () => {
+    // Reset the editing section to match the current protocol
+    if (protocol && editingSectionIndex !== null) {
+      const resetEditingProtocol = JSON.parse(JSON.stringify(protocol));
+      setEditingProtocol(resetEditingProtocol);
+    }
+    setEditingSectionIndex(null);
+  };
+  
+  // Function to check protocol compliance
+  const checkCompliance = async (protocolToCheck: any) => {
+    try {
+      setIsCheckingCompliance(true);
+      const complianceResult = await checkProtocolCompliance(protocolToCheck, refinedClaim);
+      
+      // Update protocol with compliance results
+      const updatedProtocol = {
+        ...protocolToCheck,
+        complianceStatus: complianceResult
+      };
+      
+      setProtocol(updatedProtocol);
+      
+      // Show compliance dialog if there are issues
+      if (!complianceResult.isCompliant) {
+        setShowCompliance(true);
+      }
+      
+      return complianceResult;
+    } catch (error) {
+      console.error("Error checking compliance:", error);
+      toast({
+        title: "Compliance Check Failed",
+        description: "Unable to verify regulatory compliance. Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsCheckingCompliance(false);
+    }
+  };
+  
+  const handleContinue = async () => {
+    if (protocol) {
+      // Final compliance check before continuing
+      const complianceResult = await checkCompliance(protocol);
+      
+      // Allow continuing even with compliance issues, but make sure user is aware
+      if (complianceResult && !complianceResult.isCompliant) {
+        toast({
+          title: "Compliance Issues Detected",
+          description: "Your protocol has some compliance issues. Consider resolving them before finalizing.",
+          variant: "destructive",
+        });
+      }
+      
       onNext(protocol);
     }
   };
@@ -252,9 +372,57 @@ export default function ProtocolGenerationStep({
             <CardContent className="p-4">
               <div className="space-y-6">
                 {protocol.sections.map((section, index) => (
-                  <div key={index}>
-                    <h3 className="text-lg font-medium text-neutral-800 mb-2">{section.title}</h3>
-                    <p className="text-neutral-600 whitespace-pre-line">{section.content}</p>
+                  <div key={index} className="relative">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-lg font-medium text-neutral-800">{section.title}</h3>
+                      {editingSectionIndex !== index && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleEditSection(index)}
+                        >
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {editingProtocol && editingSectionIndex === index ? (
+                      <>
+                        <Textarea
+                          value={editingProtocol.sections[index].content}
+                          onChange={(e) => {
+                            const newProtocol = JSON.parse(JSON.stringify(editingProtocol));
+                            newProtocol.sections[index].content = e.target.value;
+                            setEditingProtocol(newProtocol);
+                          }}
+                          className="min-h-[100px] mb-2"
+                        />
+                        <div className="flex justify-end space-x-2 mb-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={handleCancelEdit}
+                            className="h-8"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Cancel
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            onClick={handleSaveSection}
+                            className="h-8"
+                          >
+                            <Save className="h-4 w-4 mr-1" />
+                            Save
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-neutral-600 whitespace-pre-line">{section.content}</p>
+                    )}
+                    
                     {index < protocol.sections.length - 1 && <Separator className="mt-4" />}
                   </div>
                 ))}
