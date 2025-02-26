@@ -86,7 +86,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                 <FormControl>
                   <Input 
                     placeholder="Example: MagSleep Premium" 
-                    className="bg-card border-border"
+                    className="bg-card border-border text-foreground"
                     {...field} 
                   />
                 </FormControl>
@@ -105,7 +105,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                   <Textarea 
                     placeholder="Example: Our magnesium supplement helps improve sleep quality." 
                     rows={3}
-                    className="bg-card border-border" 
+                    className="bg-card border-border text-foreground" 
                     {...field} 
                   />
                 </FormControl>
@@ -124,7 +124,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                   <Input 
                     type="url"
                     placeholder="https://yourcompany.com"
-                    className="bg-card border-border" 
+                    className="bg-card border-border text-foreground" 
                     {...field} 
                   />
                 </FormControl>
@@ -144,7 +144,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                   <Textarea 
                     placeholder="Example: Magnesium bisglycinate (300mg), Zinc (15mg), Vitamin B6 (2mg)" 
                     rows={2}
-                    className="bg-card border-border" 
+                    className="bg-card border-border text-foreground" 
                     {...field} 
                   />
                 </FormControl>
