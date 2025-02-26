@@ -51,7 +51,7 @@ export default function StudyDesigner() {
   });
   
   // Fetch study data if ID is provided
-  const { data: fetchedStudy, isLoading, error } = useQuery({
+  const { data: fetchedStudy, isLoading, error } = useQuery<StudyDataType>({
     queryKey: [`/api/studies/${studyId}`],
     enabled: !!studyId,
   });
@@ -60,9 +60,9 @@ export default function StudyDesigner() {
     if (fetchedStudy) {
       setStudyData(prevData => ({
         ...prevData,
-        ...(fetchedStudy as StudyDataType)
+        ...fetchedStudy
       }));
-      if (fetchedStudy.currentStep) {
+      if (typeof fetchedStudy.currentStep === 'number') {
         setCurrentStep(fetchedStudy.currentStep);
       }
     }
