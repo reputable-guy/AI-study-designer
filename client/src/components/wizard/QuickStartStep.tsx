@@ -14,6 +14,7 @@ const quickStartSchema = z.object({
   originalClaim: z.string().min(10, "Please provide a more detailed description of your claim"),
   websiteUrl: z.string().url("Please enter a valid URL").or(z.string().length(0)).optional(),
   ingredients: z.string().optional(),
+  id: z.number().optional() // Add id field to schema
 });
 
 type QuickStartFormValues = z.infer<typeof quickStartSchema>;
@@ -40,9 +41,8 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
   const onSubmit = async (data: QuickStartFormValues) => {
     setIsSubmitting(true);
     try {
-      // In a real application, this would create a study in the backend
-      // For demo, we're just simulating the creation
-      await apiRequest("POST", "/api/studies", {
+      // Create the study in the backend
+      const response = await apiRequest("POST", "/api/studies", {
         userId: 1, // Assume user is logged in with ID 1
         productName: data.productName,
         originalClaim: data.originalClaim,
@@ -50,7 +50,14 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
         ingredients: data.ingredients,
       });
       
-      onNext(data);
+      // Extract the study data with ID
+      const studyData = await response.json();
+      
+      // Pass both the form data and the newly created study ID
+      onNext({
+        ...data,
+        id: studyData.id
+      });
     } catch (error) {
       console.error("Error creating study:", error);
       toast({

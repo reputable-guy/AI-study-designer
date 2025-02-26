@@ -59,11 +59,14 @@ export default function StudyDesigner() {
   ];
   
   const handleQuickStartNext = (data: any) => {
+    // Ensure we're using the ID returned from the backend
     setStudyData(prev => ({
       ...prev,
       ...data,
-      id: studyId || prev.id
+      id: data.id || studyId || prev.id
     }));
+    
+    // Move to the next step
     setCurrentStep(2);
   };
   
