@@ -3,10 +3,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 // Define the context type
 interface TestModeContextType {
   isTestMode: boolean;
+  setTestMode: (value: boolean) => void;
 }
 
 // Create the context with default value
-const TestModeContext = createContext<TestModeContextType>({ isTestMode: false });
+const TestModeContext = createContext<TestModeContextType>({
+  isTestMode: false,
+  setTestMode: () => {} // Default empty function
+});
 
 // Custom hook to use the context
 export const useTestMode = () => useContext(TestModeContext);
@@ -25,8 +29,14 @@ export const TestModeProvider: React.FC<TestModeProviderProps> = ({ children }) 
     setIsTestMode(storedValue === 'true');
   }, []);
   
+  // Handle setting test mode
+  const setTestMode = (value: boolean) => {
+    setIsTestMode(value);
+    localStorage.setItem('useTestMode', value ? 'true' : 'false');
+  };
+
   return (
-    <TestModeContext.Provider value={{ isTestMode }}>
+    <TestModeContext.Provider value={{ isTestMode, setTestMode }}>
       {children}
     </TestModeContext.Provider>
   );

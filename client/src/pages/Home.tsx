@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTestMode } from "@/lib/TestModeContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
 
 export default function Home() {
   const [, navigate] = useLocation();
-  const [testMode, setTestMode] = useState(localStorage.getItem('useTestMode') === 'true');
+  const { isTestMode, setTestMode } = useTestMode();
   const [studies, setStudies] = useState([
     {
       id: 1,
@@ -76,9 +77,8 @@ export default function Home() {
   // Handle toggling test mode
   const handleTestModeToggle = (checked: boolean) => {
     setTestMode(checked);
-    localStorage.setItem('useTestMode', checked ? 'true' : 'false');
     
-    // Force reload to apply the changes
+    // Force reload to apply the changes throughout the app
     window.location.reload();
   };
   
@@ -340,7 +340,7 @@ export default function Home() {
         <div className="flex items-center space-x-2">
           <Switch 
             id="test-mode" 
-            checked={testMode} 
+            checked={isTestMode} 
             onCheckedChange={handleTestModeToggle}
           />
           <Label htmlFor="test-mode" className="text-xs flex items-center">
@@ -348,7 +348,7 @@ export default function Home() {
             Test Mode
           </Label>
         </div>
-        {testMode && (
+        {isTestMode && (
           <span className="bg-amber-100 text-amber-800 text-xs rounded px-1 py-0.5">ON</span>
         )}
       </div>
