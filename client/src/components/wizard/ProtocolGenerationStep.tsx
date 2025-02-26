@@ -15,7 +15,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateProtocol, assessRegulatory, checkProtocolCompliance } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
-import { Check, FileText, AlertCircle, Loader2, Edit, RefreshCw, Save, XCircle, ShieldCheck, Shield } from "lucide-react";
+import { Check, FileText, AlertCircle, Loader2, Edit, RefreshCw, Save, XCircle, ShieldCheck, Shield, ArrowLeft, ArrowRight } from "lucide-react";
 import { useTestMode } from "@/lib/TestModeContext";
 import { Protocol, StudyDesign, OutcomeMeasure } from "@/lib/types";
 
@@ -286,12 +286,12 @@ export default function ProtocolGenerationStep({
   
   const renderLoadingState = () => (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Generating Protocol</h2>
+      <h2 className="text-xl font-semibold mb-4 text-foreground">Generating Protocol</h2>
       <div className="text-center py-12">
         <div className="flex flex-col items-center justify-center">
           <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
-          <h3 className="text-lg font-medium text-neutral-800 mb-2">Creating IRB-ready protocol document</h3>
-          <p className="text-neutral-500 max-w-md">
+          <h3 className="text-lg font-medium text-foreground mb-2">Creating IRB-ready protocol document</h3>
+          <p className="text-muted-foreground max-w-md">
             Our AI is analyzing your study parameters and generating a complete protocol based on best practices and regulatory requirements.
           </p>
         </div>
@@ -307,12 +307,18 @@ export default function ProtocolGenerationStep({
     return (
       <div className="p-6">
         <div className="text-center py-12">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-neutral-800 mb-2">Error generating protocol</h3>
-          <p className="text-neutral-500 max-w-md mx-auto mb-6">
+          <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">Error generating protocol</h3>
+          <p className="text-muted-foreground max-w-md mx-auto mb-6">
             We encountered an issue while creating your protocol. Please try again or contact support.
           </p>
-          <Button onClick={onBack}>Back to Study Design</Button>
+          <button 
+            className="btn-outline-reputable px-4 py-2 rounded flex items-center gap-2 mx-auto"
+            onClick={onBack}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Study Design
+          </button>
         </div>
       </div>
     );
@@ -350,7 +356,7 @@ export default function ProtocolGenerationStep({
             </div>
           </div>
           
-          <p className="text-center text-sm text-neutral-600">
+          <p className="text-center text-sm text-muted-foreground">
             This protocol follows standard IRB submission requirements and contains all necessary elements for review.
           </p>
         </CardContent>
@@ -364,25 +370,24 @@ export default function ProtocolGenerationStep({
         </TabsList>
         
         <TabsContent value="overview" className="mt-4">
-          <Card>
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="space-y-6">
                 {protocol.sections.slice(0, 3).map((section, index) => (
                   <div key={index}>
-                    <h3 className="text-lg font-medium text-neutral-800 mb-2">{section.title}</h3>
-                    <p className="text-neutral-600">{section.content}</p>
-                    {index < protocol.sections.slice(0, 3).length - 1 && <Separator className="mt-4" />}
+                    <h3 className="text-lg font-medium text-foreground mb-2">{section.title}</h3>
+                    <p className="text-muted-foreground">{section.content}</p>
+                    {index < protocol.sections.slice(0, 3).length - 1 && <Separator className="my-4 bg-border" />}
                   </div>
                 ))}
                 
                 <div className="text-center pt-2">
-                  <Button 
-                    variant="outline" 
+                  <button 
+                    className="btn-outline-reputable px-4 py-2 rounded text-primary"
                     onClick={() => setActiveTab("fullProtocol")}
-                    className="text-primary"
                   >
                     View Full Protocol
-                  </Button>
+                  </button>
                 </div>
               </div>
             </CardContent>
@@ -390,18 +395,18 @@ export default function ProtocolGenerationStep({
         </TabsContent>
         
         <TabsContent value="fullProtocol" className="mt-4">
-          <Card>
+          <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="space-y-6">
                 {protocol.sections.map((section, index) => (
                   <div key={index} className="relative">
                     <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-medium text-neutral-800">{section.title}</h3>
+                      <h3 className="text-lg font-medium text-foreground">{section.title}</h3>
                       {editingSectionIndex !== index && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                           onClick={() => handleEditSection(index)}
                         >
                           <Edit className="h-4 w-4" />
@@ -419,14 +424,14 @@ export default function ProtocolGenerationStep({
                             newProtocol.sections[index].content = e.target.value;
                             setEditingProtocol(newProtocol);
                           }}
-                          className="min-h-[100px] mb-2"
+                          className="min-h-[100px] mb-2 bg-background border-border text-foreground"
                         />
                         <div className="flex justify-end space-x-2 mb-2">
                           <Button 
                             variant="outline" 
                             size="sm" 
                             onClick={handleCancelEdit}
-                            className="h-8"
+                            className="h-8 border-border text-foreground hover:bg-accent"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
                             Cancel
@@ -434,7 +439,7 @@ export default function ProtocolGenerationStep({
                           <Button 
                             size="sm" 
                             onClick={handleSaveSection}
-                            className="h-8"
+                            className="h-8 bg-primary text-foreground hover:bg-primary/90"
                           >
                             <Save className="h-4 w-4 mr-1" />
                             Save
@@ -442,10 +447,10 @@ export default function ProtocolGenerationStep({
                         </div>
                       </>
                     ) : (
-                      <p className="text-neutral-600 whitespace-pre-line">{section.content}</p>
+                      <p className="text-muted-foreground whitespace-pre-line">{section.content}</p>
                     )}
                     
-                    {index < protocol.sections.length - 1 && <Separator className="mt-4" />}
+                    {index < protocol.sections.length - 1 && <Separator className="my-4 bg-border" />}
                   </div>
                 ))}
               </div>
@@ -457,29 +462,29 @@ export default function ProtocolGenerationStep({
       {/* Regulatory compliance note */}
       <div className={`mb-6 p-4 ${
         protocol.complianceStatus?.isCompliant === false 
-          ? 'bg-amber-50 border border-amber-100' 
-          : 'bg-blue-50 border border-blue-100'
+          ? 'bg-amber-950/20 border border-amber-800/30' 
+          : 'bg-primary/10 border border-primary/30'
       } rounded-lg`}>
         <div className="flex">
           <div className="flex-shrink-0 mr-3">
             {protocol.complianceStatus?.isCompliant === false ? (
               <Shield className="h-5 w-5 text-amber-500" />
             ) : (
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-primary" />
             )}
           </div>
           <div>
             <h4 className={`text-sm font-medium ${
               protocol.complianceStatus?.isCompliant === false
-                ? 'text-amber-800'
-                : 'text-blue-800'
+                ? 'text-amber-400'
+                : 'text-primary'
             }`}>
               Regulatory Compliance Assessment
             </h4>
             <p className={`text-sm mt-1 ${
               protocol.complianceStatus?.isCompliant === false
-                ? 'text-amber-700'
-                : 'text-blue-700'
+                ? 'text-amber-300'
+                : 'text-primary/80'
             }`}>
               {protocol.complianceStatus?.isCompliant === false ? (
                 <>
@@ -499,24 +504,24 @@ export default function ProtocolGenerationStep({
       
       {/* Compliance dialog */}
       <Dialog open={showCompliance} onOpenChange={setShowCompliance}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg bg-background border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center text-amber-700">
+            <DialogTitle className="flex items-center text-amber-400">
               <Shield className="mr-2 h-5 w-5" />
               Regulatory Compliance Issues
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 my-4">
-            <p className="text-sm mb-4">
+            <p className="text-sm mb-4 text-foreground">
               The following compliance issues were identified in your protocol. Consider addressing these before finalizing:
             </p>
             
             {protocol.complianceStatus?.issues?.map((issue, index) => (
               <div key={index} className={`p-3 rounded-md ${
-                issue.severity === 'high' ? 'bg-red-50 text-red-800' :
-                issue.severity === 'medium' ? 'bg-amber-50 text-amber-800' :
-                'bg-blue-50 text-blue-800'
+                issue.severity === 'high' ? 'bg-red-950/30 text-red-300' :
+                issue.severity === 'medium' ? 'bg-amber-950/30 text-amber-300' :
+                'bg-primary/10 text-primary'
               }`}>
                 <h4 className="font-medium text-sm mb-1">
                   {issue.section} - {issue.issue}
@@ -532,6 +537,7 @@ export default function ProtocolGenerationStep({
             <Button
               variant="outline"
               onClick={() => setShowCompliance(false)}
+              className="border-border text-foreground hover:bg-accent"
             >
               Continue anyway
             </Button>
@@ -540,6 +546,7 @@ export default function ProtocolGenerationStep({
                 setShowCompliance(false);
                 setActiveTab("fullProtocol");
               }}
+              className="bg-primary text-foreground hover:bg-primary/90"
             >
               Edit Protocol
             </Button>
@@ -553,7 +560,7 @@ export default function ProtocolGenerationStep({
           variant="outline"
           onClick={() => checkCompliance(protocol)}
           disabled={isCheckingCompliance}
-          className="flex items-center"
+          className="flex items-center border-border text-foreground hover:bg-accent"
         >
           {isCheckingCompliance ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -566,18 +573,21 @@ export default function ProtocolGenerationStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
+        <button 
+          className="btn-outline-reputable px-4 py-2 rounded flex items-center gap-2"
           onClick={onBack}
         >
+          <ArrowLeft className="h-4 w-4" />
           Back
-        </Button>
-        <Button 
+        </button>
+        <button 
+          className={`btn-primary-reputable px-4 py-2 rounded flex items-center gap-2 ${isGenerating ? 'opacity-70 cursor-not-allowed' : ''}`}
           onClick={handleContinue}
           disabled={isGenerating}
         >
           {isGenerating ? "Generating..." : "Continue to Export"}
-        </Button>
+          <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
