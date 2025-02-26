@@ -208,124 +208,148 @@ export default function ClaimRefinementStep({
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // First check if we have a valid study ID
-      if (!studyId || isNaN(studyId)) {
-        // If no valid study ID, just proceed with the selected/custom claim without updating backend
-        if (selectedClaimId === "custom") {
-          if (!customClaim.trim()) {
-            toast({
-              title: "Error",
-              description: "Please enter a custom claim.",
-              variant: "destructive",
-            });
-            setIsSubmitting(false);
-            return;
-          }
-          // Just return the custom claim to the parent component
-          onNext(customClaim);
-        } else if (selectedClaimId) {
-          // Find the claim in our local state
-          const selectedClaim = suggestedClaims.find((c: ClaimSuggestion) => c.id?.toString() === selectedClaimId);
-          if (selectedClaim) {
-            // Return the selected claim to the parent component
-            onNext(selectedClaim.claim);
-          } else {
-            throw new Error("Claim not found");
-          }
-        } else {
+      console.log("Starting claim selection process");
+      
+      // First check if user has selected a claim or provided a custom one
+      if (!selectedClaimId && (!customClaim || !customClaim.trim())) {
+        toast({
+          title: "Selection Required",
+          description: "Please select a claim or write your own.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Handle custom claim
+      if (selectedClaimId === "custom") {
+        if (!customClaim.trim()) {
           toast({
             title: "Error",
-            description: "Please select a claim or write your own.",
+            description: "Please enter a custom claim.",
             variant: "destructive",
           });
           setIsSubmitting(false);
           return;
         }
-      } else {
-        // Normal flow with valid study ID
-        if (selectedClaimId === "custom") {
-          if (!customClaim.trim()) {
-            toast({
-              title: "Error",
-              description: "Please enter a custom claim.",
-              variant: "destructive",
-            });
-            setIsSubmitting(false);
-            return;
-          }
-          
-          // Update study with custom claim
-          await apiRequest("PATCH", `/api/studies/${studyId}`, {
-            refinedClaim: customClaim,
-            currentStep: 3 // Move to next step
-          });
-          
-          onNext(customClaim);
-        } else if (selectedClaimId) {
+        
+        console.log("Using custom claim:", customClaim);
+        
+        // If we have a valid study ID, update it in the backend
+        if (studyId && !isNaN(studyId)) {
           try {
-            // Check if we have a negative ID (fallback data)
-            if (selectedClaimId && parseInt(selectedClaimId) < 0) {
-              // With fallback data, just find the claim and use it directly
-              const selectedClaim = suggestedClaims.find((c: ClaimSuggestion) => c.id?.toString() === selectedClaimId);
-              if (selectedClaim) {
-                // Update study with the selected claim
-                await apiRequest("PATCH", `/api/studies/${studyId}`, {
-                  refinedClaim: selectedClaim.claim,
-                  currentStep: 3 // Move to next step
-                });
-                
-                onNext(selectedClaim.claim);
-                return;
-              }
-            }
-            
-            // Regular flow for real claim IDs
-            const response = await apiRequest(
-              "POST", 
-              `/api/suggested-claims/${selectedClaimId}/select`,
-              {}
-            );
-            
-            const selectedClaim = await response.json();
-            onNext(selectedClaim.claim);
-          } catch (selectionError) {
-            console.error("Error selecting claim:", selectionError);
-            
-            // Fallback - find the claim in our local state
-            const selectedClaim = suggestedClaims.find((c: ClaimSuggestion) => c.id?.toString() === selectedClaimId);
-            if (selectedClaim) {
-              // Try to update study
-              try {
-                await apiRequest("PATCH", `/api/studies/${studyId}`, {
-                  refinedClaim: selectedClaim.claim,
-                  currentStep: 3 // Move to next step
-                });
-              } catch (updateError) {
-                console.warn("Couldn't update study, but continuing with selection", updateError);
-              }
-              
-              // Even if update fails, continue with the selection
-              onNext(selectedClaim.claim);
-            } else {
-              throw new Error("Claim not found");
-            }
+            await apiRequest("PATCH", `/api/studies/${studyId}`, {
+              refinedClaim: customClaim,
+              currentStep: 3 // Move to next step
+            });
+            console.log("Successfully updated study with custom claim");
+          } catch (updateError) {
+            console.warn("Failed to update study with custom claim:", updateError);
+            // Continue even if update fails
           }
-        } else {
+        }
+        
+        // Move to next step with the custom claim
+        onNext(customClaim);
+        return;
+      }
+      
+      // Handle selected claim from suggestions
+      if (selectedClaimId) {
+        console.log(`Selected claim ID: ${selectedClaimId}`);
+        
+        // Find the claim in our local state first as a fallback
+        const selectedClaimObject = suggestedClaims.find(
+          (c: ClaimSuggestion) => c.id?.toString() === selectedClaimId
+        );
+        
+        if (!selectedClaimObject) {
+          console.error("Selected claim not found in local state");
           toast({
             title: "Error",
-            description: "Please select a claim or write your own.",
+            description: "Selected claim not found. Please try again.",
             variant: "destructive",
           });
+          setIsSubmitting(false);
+          return;
         }
+        
+        // Store the claim text for use later
+        const claimText = selectedClaimObject.claim;
+        console.log("Found claim in local state:", claimText);
+        
+        // If we have a valid study ID, try to update the backend
+        if (studyId && !isNaN(studyId)) {
+          try {
+            // For negative IDs (fallback data), we need a different approach
+            if (parseInt(selectedClaimId) < 0) {
+              console.log("Using fallback claim with negative ID");
+              // Just update the study with the claim text
+              await apiRequest("PATCH", `/api/studies/${studyId}`, {
+                refinedClaim: claimText,
+                currentStep: 3 // Move to next step
+              });
+            } else {
+              // For regular IDs, use the selection endpoint
+              console.log("Using regular claim selection endpoint");
+              try {
+                const response = await apiRequest(
+                  "POST", 
+                  `/api/suggested-claims/${selectedClaimId}/select`,
+                  {}
+                );
+                
+                // Check if the response has the expected shape
+                const apiClaim = await response.json();
+                
+                if (!apiClaim || !apiClaim.claim) {
+                  console.warn("Invalid response from claim selection API:", apiClaim);
+                  // Fall back to updating the study directly
+                  await apiRequest("PATCH", `/api/studies/${studyId}`, {
+                    refinedClaim: claimText,
+                    currentStep: 3 // Move to next step
+                  });
+                }
+              } catch (selectionError) {
+                console.error("Error selecting claim through API:", selectionError);
+                // Fall back to updating the study directly
+                await apiRequest("PATCH", `/api/studies/${studyId}`, {
+                  refinedClaim: claimText,
+                  currentStep: 3 // Move to next step
+                });
+              }
+            }
+          } catch (allUpdateError) {
+            console.error("All update attempts failed:", allUpdateError);
+            // Continue with the frontend flow even if all backend updates fail
+          }
+        }
+        
+        // Move to next step with the selected claim text
+        // This ensures we continue even if backend operations fail
+        console.log("Moving to next step with claim:", claimText);
+        onNext(claimText);
+        return;
       }
-    } catch (error) {
-      console.error("Error saving refined claim:", error);
+      
+      // If we get here, something unexpected happened
       toast({
         title: "Error",
-        description: "Failed to save your claim. Please try again.",
+        description: "Please select a claim or write your own.",
         variant: "destructive",
       });
+      setIsSubmitting(false);
+    } catch (error) {
+      // Catch-all error handler for any unexpected issues
+      console.error("Unexpected error in claim selection process:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
     } finally {
+      // Always clean up loading state
       setIsSubmitting(false);
     }
   };
