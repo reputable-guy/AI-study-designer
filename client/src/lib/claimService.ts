@@ -3,7 +3,7 @@ import { apiRequest } from "./queryClient";
 // Define types for claim data
 export interface ClaimSuggestion {
   id?: number;
-  studyId?: number;
+  studyId?: number | null; // Allow null study ID for fallback claims
   claim: string;
   measurability: string;
   priorEvidence: string;

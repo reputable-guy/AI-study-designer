@@ -20,9 +20,24 @@ export default function StudyDesigner() {
   const studyId = id ? parseInt(id) : null;
   const { toast } = useToast();
   
+  // Define a type for our study data
+  interface StudyDataType {
+    id: number | null;
+    userId: number;
+    productName: string;
+    originalClaim: string;
+    websiteUrl?: string;
+    ingredients?: string;
+    refinedClaim: string | null;
+    currentStep: number;
+    outcomeMeasures: any[] | null;
+    studyDesign: any | null;
+    protocol: any | null;
+  }
+
   const [currentStep, setCurrentStep] = useState(1);
-  const [studyData, setStudyData] = useState<any>({
-    id: null,
+  const [studyData, setStudyData] = useState<StudyDataType>({
+    id: studyId, // Use the studyId from params if available
     userId: 1, // Assume user is logged in with ID 1
     productName: "",
     originalClaim: "",
@@ -57,10 +72,10 @@ export default function StudyDesigner() {
     "Protocol",
     "Export"
   ];
-  
+
   const handleQuickStartNext = (data: any) => {
     // Ensure we're using the ID returned from the backend
-    setStudyData(prev => ({
+    setStudyData((prev: StudyDataType) => ({
       ...prev,
       ...data,
       id: data.id || studyId || prev.id
@@ -71,7 +86,7 @@ export default function StudyDesigner() {
   };
   
   const handleClaimRefinementNext = (refinedClaim: string) => {
-    setStudyData(prev => ({
+    setStudyData((prev: StudyDataType) => ({
       ...prev,
       refinedClaim
     }));
@@ -91,7 +106,7 @@ export default function StudyDesigner() {
   };
   
   const handleProtocolNext = (protocol: any) => {
-    setStudyData(prev => ({
+    setStudyData((prev: StudyDataType) => ({
       ...prev,
       protocol
     }));

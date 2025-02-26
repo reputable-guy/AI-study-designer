@@ -10,7 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 interface ClaimSuggestion {
   id?: number;
-  studyId?: number;
+  studyId?: number | null; // Allow null study ID for fallback claims
   claim: string;
   measurability: string;
   priorEvidence: string;
