@@ -89,25 +89,25 @@ export default function Home() {
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Hero section */}
-          <div className="mb-12 px-4 py-10 bg-white rounded-xl shadow-sm border border-neutral-100">
+          <div className="mb-12 px-4 py-10 bg-card rounded-xl shadow-sm border border-border">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 AI-Driven Scientific Studies for Wellness Brands
               </h1>
-              <p className="text-xl text-neutral-500 mb-8">
+              <p className="text-xl text-muted-foreground mb-8">
                 Design IRB-ready, compliance-focused clinical studies for your wellness products in minutes.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link href="/study-designer">
-                  <Button size="lg" className="w-full sm:w-auto">
+                  <button className="btn-reputable w-full sm:w-auto px-6 py-3 flex items-center justify-center text-base font-medium rounded">
                     <Beaker className="h-5 w-5 mr-2" />
                     Design a New Study
-                  </Button>
+                  </button>
                 </Link>
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                <button className="btn-outline-reputable w-full sm:w-auto px-6 py-3 flex items-center justify-center text-base font-medium rounded">
                   <FileText className="h-5 w-5 mr-2" />
                   View Sample Study
-                </Button>
+                </button>
               </div>
             </div>
           </div>
@@ -312,21 +312,21 @@ export default function Home() {
           </div>
           
           {/* CTA section */}
-          <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-8 text-white">
+          <div className="bg-primary rounded-xl p-8 text-primary-foreground">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-2xl font-bold mb-4">Ready to Execute Your Study?</h2>
               <p className="mb-6">
                 Take your protocol from design to execution. Our platform handles participant recruitment, compliance tracking, and data analysis.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button variant="secondary" size="lg" className="bg-white text-primary hover:bg-neutral-100">
+                <button className="bg-background text-foreground hover:bg-muted px-6 py-3 rounded flex items-center justify-center text-base font-medium">
                   <Users className="h-5 w-5 mr-2" />
                   Recruit Participants
-                </Button>
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                </button>
+                <button className="border border-background text-background hover:bg-primary/90 px-6 py-3 rounded flex items-center justify-center text-base font-medium">
                   <BarChart3 className="h-5 w-5 mr-2" />
                   Learn About Analysis
-                </Button>
+                </button>
               </div>
             </div>
           </div>

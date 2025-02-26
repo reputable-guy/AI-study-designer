@@ -10,15 +10,19 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-card border-b border-border shadow-sm">
+    <header className="bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center">
           <Link href="/">
             <a className="flex items-center">
-              <svg className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              {/* Reputable logo - hexagon shape */}
+              <svg width="32" height="32" viewBox="0 0 302 348" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-foreground">
+                <path d="M151 0L0 87V261L151 348L302 261V87L151 0ZM273.033 242.669L151 311.704L28.967 242.669V105.331L151 36.296L273.033 105.331V242.669Z" fill="currentColor"/>
+                <path d="M101.321 112.38L151 84.085L200.679 112.38L200.679 235.62L151 263.915L101.321 235.62L101.321 112.38Z" fill="currentColor"/>
+                <path d="M151 36.296L273.033 105.331V242.669L151 311.704V263.915L200.679 235.62V112.38L151 84.085V36.296Z" fill="currentColor" fillOpacity="0.5"/>
+                <path d="M28.967 242.669L151 311.704V263.915L101.321 235.62L101.321 112.38L151 84.085V36.296L28.967 105.331V242.669Z" fill="currentColor" fillOpacity="0.75"/>
               </svg>
-              <span className="ml-2 text-xl font-semibold text-foreground">Reputable</span>
+              <span className="ml-2 text-xl font-bold tracking-wide text-foreground">REPUTABLE</span>
             </a>
           </Link>
         </div>

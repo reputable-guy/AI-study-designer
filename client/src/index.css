@@ -13,8 +13,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 145 65% 40%;
-    --primary-foreground: 210 40% 98%;
+    /* Reputable bright green CTA color */
+    --primary: 84 100% 67%;
+    --primary-foreground: 0 0% 0%;
 
     --secondary: 173 100% 37%;
     --secondary-foreground: 222 47% 11%;
@@ -30,12 +31,12 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 145 65% 40%;
+    --ring: 84 100% 67%;
     
     --radius: 0.5rem;
     
     /* Chart colors */
-    --chart-1: 145 65% 40%;
+    --chart-1: 84 100% 67%;
     --chart-2: 173 100% 37%;
     --chart-3: 0 91% 71%;
     --chart-4: 262 83% 58%;
@@ -44,29 +45,32 @@
     /* Sidebar colors */
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 173 100% 37%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 145 65% 40%;
-    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-primary: 84 100% 67%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 84 100% 67%;
+    --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 224 71% 4%;
     --sidebar-ring: 173 100% 37%;
   }
   
   .dark {
-    --background: 222 47% 11%;
+    /* Dark background (nearly black) from the screenshot */
+    --background: 0 0% 9%;
     --foreground: 210 40% 98%;
 
-    --card: 224 71% 4%;
+    /* Card background (slightly lighter dark) from the screenshot */
+    --card: 220 14% 14%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 224 71% 4%;
+    --popover: 220 14% 14%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 145 65% 40%;
-    --primary-foreground: 210 40% 98%;
+    /* Reputable bright green CTA color */
+    --primary: 84 100% 67%;
+    --primary-foreground: 0 0% 0%;
 
     --secondary: 173 100% 37%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary-foreground: 0 0% 0%;
 
     --muted: 223 47% 20%;
     --muted-foreground: 215.4 16.3% 76.9%;
@@ -79,22 +83,22 @@
 
     --border: 216 34% 17%;
     --input: 216 34% 17%;
-    --ring: 145 65% 40%;
+    --ring: 84 100% 67%;
     
     /* Chart colors */
-    --chart-1: 145 65% 40%;
+    --chart-1: 84 100% 67%;
     --chart-2: 173 100% 37%;
     --chart-3: 0 91% 71%;
     --chart-4: 262 83% 58%;
     --chart-5: 31 95% 64%;
     
-    /* Sidebar colors */
-    --sidebar-background: 224 71% 4%;
+    /* Sidebar colors - match the screenshot */
+    --sidebar-background: 0 0% 9%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 173 100% 37%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 145 65% 40%;
-    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-primary: 84 100% 67%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 84 100% 67%;
+    --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 216 34% 17%;
     --sidebar-ring: 173 100% 37%;
   }
@@ -140,5 +144,28 @@
   .step-indicator {
     height: 4px;
     transition: width 0.3s ease;
+  }
+  
+  /* Custom button styles based on the screenshot */
+  .btn-reputable {
+    @apply bg-primary text-primary-foreground font-medium px-4 py-2 rounded hover:brightness-105 transition-all;
+  }
+  
+  .btn-outline-reputable {
+    @apply border border-border bg-transparent text-foreground hover:border-primary hover:text-primary transition-all;
+  }
+  
+  /* Navigation styles based on the screenshot */
+  .nav-item {
+    @apply flex items-center gap-2 py-2 px-3 text-foreground hover:text-primary transition-all rounded-md;
+  }
+  
+  .nav-item-active {
+    @apply bg-primary text-primary-foreground font-medium;
+  }
+  
+  /* Card styles for dark mode */
+  .card-reputable {
+    @apply bg-card rounded-lg border border-border p-4;
   }
 }
