@@ -6,18 +6,8 @@ import { Label } from "@/components/ui/label";
 import { recommendOutcomeMeasures } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Info, AlertTriangle } from "lucide-react";
-
-interface OutcomeMeasure {
-  id?: number;
-  studyId?: number;
-  name: string;
-  description: string;
-  feasibility: string;
-  regulatoryAcceptance: string;
-  participantBurden: string;
-  wearableCompatible: boolean;
-  selected?: boolean;
-}
+import { OutcomeMeasure } from "@/lib/types";
+import { withErrorHandling, getFallbackOutcomeMeasures } from "@/lib/errorHandling";
 
 interface OutcomeSelectionStepProps {
   studyId: number;
@@ -56,73 +46,28 @@ export default function OutcomeSelectionStep({
             }));
             
             setOutcomeMeasures(cleanedMeasures);
-            
-            // If there was a previously selected measure, just get its ID but don't auto-select
-            const previouslySelectedMeasure = measures.find((m: OutcomeMeasure) => m.selected);
-            if (previouslySelectedMeasure) {
-              // Just store the ID but don't auto-select
-              setSelectedMeasureId(null);
-            }
-            
             setIsLoading(false);
             return;
           }
         }
         
-        // If no measures found, recommend new ones
-        const recommendedMeasures = await recommendOutcomeMeasures(refinedClaim);
-        // Ensure these aren't pre-selected either
-        const cleanedRecommendedMeasures = recommendedMeasures.map((m: OutcomeMeasure) => ({
-          ...m,
-          selected: false
-        }));
-        setOutcomeMeasures(cleanedRecommendedMeasures);
-      } catch (error) {
-        console.error("Error fetching outcome measures:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch outcome measures. Using fallback data.",
-          variant: "destructive",
-        });
-        
-        // Fallback data - ensure they're not pre-selected
-        const fallbackMeasures = [
-          {
-            id: 1,
-            studyId: 1,
-            name: "REM Sleep Duration",
-            description: "Percentage of time spent in REM sleep per night",
-            feasibility: "High",
-            regulatoryAcceptance: "Accepted",
-            participantBurden: "Low",
-            wearableCompatible: true,
-            selected: false
+        // If no measures found, generate new ones through our error-handling utility
+        const measures = await withErrorHandling(
+          // API call
+          async () => {
+            const recommendedMeasures = await recommendOutcomeMeasures(refinedClaim);
+            return recommendedMeasures.map((m: OutcomeMeasure) => ({
+              ...m,
+              selected: false
+            }));
           },
-          {
-            id: 2,
-            studyId: 1,
-            name: "Pittsburgh Sleep Quality Index (PSQI)",
-            description: "Validated questionnaire measuring sleep quality",
-            feasibility: "Medium",
-            regulatoryAcceptance: "Widely accepted",
-            participantBurden: "Medium",
-            wearableCompatible: false,
-            selected: false
-          },
-          {
-            id: 3,
-            studyId: 1,
-            name: "Sleep Onset Latency",
-            description: "Time to fall asleep after going to bed",
-            feasibility: "High",
-            regulatoryAcceptance: "Accepted",
-            participantBurden: "Low",
-            wearableCompatible: true,
-            selected: false
-          }
-        ];
+          // Fallback data
+          getFallbackOutcomeMeasures(studyId),
+          // Error message
+          "Failed to generate outcome measures. Using fallback options instead."
+        );
         
-        setOutcomeMeasures(fallbackMeasures);
+        setOutcomeMeasures(measures);
       } finally {
         setIsLoading(false);
       }
@@ -143,22 +88,28 @@ export default function OutcomeSelectionStep({
     
     setIsSubmitting(true);
     try {
-      // Select the outcome measure in the backend
-      await fetch(`/api/outcome-measures/${selectedMeasureId}/select`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      // Use the error handling utility to make the API call
+      const success = await withErrorHandling(
+        async () => {
+          const response = await fetch(`/api/outcome-measures/${selectedMeasureId}/select`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+          
+          return true;
+        },
+        false, // Fallback value if API fails
+        "Failed to save your selection. Proceeding anyway."
+      );
       
+      // Even if the API call fails, we can still proceed
       onNext();
-    } catch (error) {
-      console.error("Error selecting outcome measure:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save your selection. Please try again.",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }
