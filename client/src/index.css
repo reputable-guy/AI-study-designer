@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 222 92% 56%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 173 100% 37%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 0 91% 71%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222 92% 56%;
+    
+    --radius: 0.5rem;
+    
+    /* Chart colors */
+    --chart-1: 222 92% 56%;
+    --chart-2: 173 100% 37%;
+    --chart-3: 0 91% 71%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 31 95% 64%;
+    
+    /* Sidebar colors */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 173 100% 37%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 222 92% 56%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 224 71% 4%;
+    --sidebar-ring: 173 100% 37%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  
+  .ai-badge {
+    @apply bg-gradient-to-r from-primary to-secondary text-white;
+  }
+  
+  .ai-suggestion {
+    @apply border-l-[3px] border-primary;
+  }
+  
+  .evidence-high {
+    @apply border-l-[3px] border-green-500;
+  }
+  
+  .evidence-moderate {
+    @apply border-l-[3px] border-orange-500;
+  }
+  
+  .evidence-low {
+    @apply border-l-[3px] border-red-500;
+  }
+  
+  .bubble-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 91, 255, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(45, 91, 255, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(45, 91, 255, 0); }
+  }
+  
+  .step-indicator {
+    height: 4px;
+    transition: width 0.3s ease;
+  }
+}
