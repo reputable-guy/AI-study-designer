@@ -189,12 +189,12 @@ export default function ClaimRefinementStep({
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
-                <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
+              <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
+                <div className="h-6 bg-muted rounded w-3/4 mb-3"></div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-2/3"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -205,7 +205,7 @@ export default function ClaimRefinementStep({
               {suggestedClaims.map((claim) => (
                 <div 
                   key={claim.id} 
-                  className="ai-suggestion p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="ai-suggestion p-4 bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => setSelectedClaimId(claim.id?.toString() || "")}
                 >
                   <div className="flex items-start">
@@ -215,7 +215,7 @@ export default function ClaimRefinementStep({
                     <div className="flex-grow">
                       <Label 
                         htmlFor={`claim-${claim.id}`}
-                        className="block font-medium text-neutral-800 cursor-pointer"
+                        className="block font-medium text-foreground cursor-pointer"
                       >
                         {claim.claim}
                       </Label>
@@ -242,7 +242,7 @@ export default function ClaimRefinementStep({
               
               {/* Custom claim option */}
               <div 
-                className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="p-4 bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => setSelectedClaimId("custom")}
               >
                 <div className="flex items-start">
@@ -252,7 +252,7 @@ export default function ClaimRefinementStep({
                   <div className="flex-grow">
                     <Label 
                       htmlFor="customClaim"
-                      className="block font-medium text-neutral-800 cursor-pointer"
+                      className="block font-medium text-foreground cursor-pointer"
                     >
                       Write your own claim
                     </Label>
@@ -274,14 +274,14 @@ export default function ClaimRefinementStep({
       </div>
       
       {/* Claim crafting tips */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+      <div className="mb-6 p-4 bg-blue-950/20 border border-blue-800/30 rounded-lg">
         <div className="flex">
           <div className="flex-shrink-0 mr-2">
-            <Info className="h-5 w-5 text-blue-500" />
+            <Info className="h-5 w-5 text-blue-400" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-blue-800">Claim Crafting Tips</h4>
-            <p className="text-sm text-blue-700 mt-1">
+            <h4 className="text-sm font-medium text-blue-300">Claim Crafting Tips</h4>
+            <p className="text-sm text-blue-400 mt-1">
               The best scientific claims are specific, measurable, and have a reasonable basis in existing research. 
               Claims that can be measured with wearable devices generally reduce participant burden and increase data quality.
             </p>
@@ -301,6 +301,7 @@ export default function ClaimRefinementStep({
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || !selectedClaimId}
+          className="btn-primary-reputable"
         >
           {isSubmitting ? "Processing..." : "Continue to Literature Review"}
         </Button>
