@@ -49,12 +49,19 @@ export default function OutcomeSelectionStep({
           const measures = await response.json();
           
           if (measures && measures.length > 0) {
-            setOutcomeMeasures(measures);
+            // Make sure measures are not pre-selected
+            const cleanedMeasures = measures.map((m: OutcomeMeasure) => ({
+              ...m,
+              selected: false // Reset selection status
+            }));
             
-            // If there's a selected measure, set it
-            const selectedMeasure = measures.find(m => m.selected);
-            if (selectedMeasure) {
-              setSelectedMeasureId(selectedMeasure.id.toString());
+            setOutcomeMeasures(cleanedMeasures);
+            
+            // If there was a previously selected measure, just get its ID but don't auto-select
+            const previouslySelectedMeasure = measures.find((m: OutcomeMeasure) => m.selected);
+            if (previouslySelectedMeasure) {
+              // Just store the ID but don't auto-select
+              setSelectedMeasureId(null);
             }
             
             setIsLoading(false);
@@ -64,7 +71,12 @@ export default function OutcomeSelectionStep({
         
         // If no measures found, recommend new ones
         const recommendedMeasures = await recommendOutcomeMeasures(refinedClaim);
-        setOutcomeMeasures(recommendedMeasures);
+        // Ensure these aren't pre-selected either
+        const cleanedRecommendedMeasures = recommendedMeasures.map((m: OutcomeMeasure) => ({
+          ...m,
+          selected: false
+        }));
+        setOutcomeMeasures(cleanedRecommendedMeasures);
       } catch (error) {
         console.error("Error fetching outcome measures:", error);
         toast({
@@ -73,7 +85,7 @@ export default function OutcomeSelectionStep({
           variant: "destructive",
         });
         
-        // Fallback data
+        // Fallback data - ensure they're not pre-selected
         const fallbackMeasures = [
           {
             id: 1,
@@ -83,7 +95,8 @@ export default function OutcomeSelectionStep({
             feasibility: "High",
             regulatoryAcceptance: "Accepted",
             participantBurden: "Low",
-            wearableCompatible: true
+            wearableCompatible: true,
+            selected: false
           },
           {
             id: 2,
@@ -93,7 +106,8 @@ export default function OutcomeSelectionStep({
             feasibility: "Medium",
             regulatoryAcceptance: "Widely accepted",
             participantBurden: "Medium",
-            wearableCompatible: false
+            wearableCompatible: false,
+            selected: false
           },
           {
             id: 3,
@@ -103,7 +117,8 @@ export default function OutcomeSelectionStep({
             feasibility: "High",
             regulatoryAcceptance: "Accepted",
             participantBurden: "Low",
-            wearableCompatible: true
+            wearableCompatible: true,
+            selected: false
           }
         ];
         

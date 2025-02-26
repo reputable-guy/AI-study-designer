@@ -177,7 +177,9 @@ export default function LiteratureReviewStep({
     }
   };
   
-  const toggleStudyDetails = (id: number) => {
+  const toggleStudyDetails = (id: number | undefined) => {
+    if (id === undefined) return;
+    console.log('Toggling study details for ID:', id, 'Current expanded ID:', expandedStudyId);
     setExpandedStudyId(expandedStudyId === id ? null : id);
   };
   
@@ -383,6 +385,7 @@ export default function LiteratureReviewStep({
                       <div className="mt-3 text-sm text-neutral-600">
                         <p>{study.summary}</p>
                         {study.details && <p className="mt-2">{study.details}</p>}
+                        {!study.details && <p className="mt-2">No additional details available for this study.</p>}
                       </div>
                     )}
                   </div>
