@@ -3,7 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Check, Info } from "lucide-react";
+import { Check, Info, ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ClaimSuggestion } from "@/lib/types";
 import { withErrorHandling, getFallbackClaims } from "@/lib/errorHandling";
@@ -160,7 +160,7 @@ export default function ClaimRefinementStep({
       ) : (
         <Info className="h-4 w-4 text-amber-500 mr-1" />
       )}
-      <span className="text-xs text-neutral-600">{text}</span>
+      <span className="text-xs text-muted-foreground">{text}</span>
     </div>
   );
   
@@ -168,23 +168,23 @@ export default function ClaimRefinementStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold">Refine your claim</h2>
-          <p className="text-neutral-500">Based on your input, we've identified potential scientific claims you can test.</p>
+          <h2 className="text-xl font-semibold text-foreground">Refine your claim</h2>
+          <p className="text-muted-foreground">Based on your input, we've identified potential scientific claims you can test.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Generated</span>
+          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Generated</span>
         </div>
       </div>
 
       {/* Original claim */}
-      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
-        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your original input:</h3>
-        <p className="text-neutral-700">{originalClaim}</p>
+      <div className="mb-6 p-4 bg-card rounded-lg border border-border">
+        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your original input:</h3>
+        <p className="text-foreground">{originalClaim}</p>
       </div>
 
       {/* AI-generated claim suggestions */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-neutral-700 mb-3">Select a refined claim to test:</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">Select a refined claim to test:</h3>
         
         {isLoading ? (
           <div className="space-y-4">
