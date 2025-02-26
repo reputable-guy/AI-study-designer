@@ -16,7 +16,10 @@ import {
   TrendingUp, 
   PlusCircle, 
   BarChart3,
-  FlaskConical
+  FlaskConical,
+  Moon,
+  Activity,
+  Clock
 } from "lucide-react";
 
 export default function Home() {
