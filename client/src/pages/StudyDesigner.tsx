@@ -247,8 +247,8 @@ export default function StudyDesigner() {
         <div className="container mx-auto px-4 py-6">
           {/* Page title and description */}
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-foreground">AI-Driven Study Designer</h1>
-            <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+            <h1 className="text-3xl font-bold text-neutral-800">AI-Driven Study Designer</h1>
+            <p className="mt-2 text-neutral-600 max-w-2xl mx-auto">
               Design IRB-ready, compliance-focused clinical studies for your wellness products in minutes.
             </p>
           </div>
@@ -261,9 +261,9 @@ export default function StudyDesigner() {
           />
           
           {/* Wizard content container */}
-          <div className="max-w-4xl mx-auto bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-neutral-100 overflow-hidden">
             {/* Step tabs - visible on larger screens */}
-            <div className="hidden md:flex border-b border-border">
+            <div className="hidden md:flex border-b border-neutral-100">
               {stepNames.map((step, index) => (
                 <button 
                   key={index}

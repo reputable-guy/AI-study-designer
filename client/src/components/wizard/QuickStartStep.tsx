@@ -72,8 +72,8 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
   
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4 text-foreground">Tell us about your product</h2>
-      <p className="text-muted-foreground mb-6">We'll use this information to help you design a scientific study that supports your product claims.</p>
+      <h2 className="text-xl font-semibold mb-4 text-neutral-800">Tell us about your product</h2>
+      <p className="text-neutral-600 mb-6">We'll use this information to help you design a scientific study that supports your product claims.</p>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -82,11 +82,11 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
             name="productName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Product Name <span className="text-muted-foreground/70">(optional)</span></FormLabel>
+                <FormLabel>Product Name <span className="text-neutral-500">(optional)</span></FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="Example: MagSleep Premium" 
-                    className="bg-card border-border text-foreground"
+                    className="bg-white border-neutral-200 text-neutral-800"
                     {...field} 
                   />
                 </FormControl>
@@ -105,7 +105,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                   <Textarea 
                     placeholder="Example: Our magnesium supplement helps improve sleep quality." 
                     rows={3}
-                    className="bg-card border-border text-foreground" 
+                    className="bg-white border-neutral-200 text-neutral-800" 
                     {...field} 
                   />
                 </FormControl>
@@ -124,7 +124,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                   <Input 
                     type="url"
                     placeholder="https://yourcompany.com"
-                    className="bg-card border-border text-foreground" 
+                    className="bg-white border-neutral-200 text-neutral-800" 
                     {...field} 
                   />
                 </FormControl>
@@ -144,7 +144,7 @@ export default function QuickStartStep({ onNext, defaultValues = {} }: QuickStar
                   <Textarea 
                     placeholder="Example: Magnesium bisglycinate (300mg), Zinc (15mg), Vitamin B6 (2mg)" 
                     rows={2}
-                    className="bg-card border-border text-foreground" 
+                    className="bg-white border-neutral-200 text-neutral-800" 
                     {...field} 
                   />
                 </FormControl>
