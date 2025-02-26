@@ -273,7 +273,7 @@ export default function StudyDesignStep({
         <Card>
           <CardContent className="p-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-medium text-lg text-neutral-800 mb-2">Sample Size</h3>
+              <h3 className="font-medium text-lg text-foreground mb-2">Sample Size</h3>
               
               {/* Educational Module Dialog */}
               <Dialog>
@@ -350,7 +350,7 @@ export default function StudyDesignStep({
                         For your study on {refinedClaim.toLowerCase()}, we've calculated the sample size based on:
                       </p>
                       
-                      <div className="bg-neutral-50 p-4 rounded-md mb-4">
+                      <div className="bg-card p-4 rounded-md mb-4 border border-border">
                         <ul className="space-y-3">
                           <li className="flex items-start">
                             <div className="bg-blue-100 rounded-full p-1 mr-2 flex-shrink-0">
@@ -386,10 +386,10 @@ export default function StudyDesignStep({
                       <p className="mb-3">
                         For a two-sample t-test (common in clinical trials), the simplified formula is:
                       </p>
-                      <div className="bg-neutral-100 p-3 rounded-md mb-4 text-center font-mono">
+                      <div className="bg-muted p-3 rounded-md mb-4 text-center font-mono">
                         n = 2 × (Zα + Zβ)² × σ² ÷ d²
                       </div>
-                      <p className="text-sm text-neutral-600 mb-3">
+                      <p className="text-sm text-muted-foreground mb-3">
                         Where <em>n</em> is sample size per group, <em>Zα</em> and <em>Zβ</em> are standard normal deviates for α and β,
                         <em>σ</em> is the standard deviation, and <em>d</em> is the expected difference between groups.
                       </p>
@@ -588,7 +588,7 @@ export default function StudyDesignStep({
         <Card>
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium text-lg text-neutral-800">Participant Criteria</h3>
+              <h3 className="font-medium text-lg text-foreground">Participant Criteria</h3>
               <Button
                 variant="outline" 
                 size="sm" 
@@ -868,11 +868,11 @@ export default function StudyDesignStep({
         <Card className="opacity-60">
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium text-lg text-neutral-800">Advanced Design Options</h3>
+              <h3 className="font-medium text-lg text-foreground">Advanced Design Options</h3>
               <span className="text-xs bg-neutral-200 text-neutral-600 px-2 py-1 rounded">Coming Soon</span>
             </div>
             
-            <p className="text-sm text-neutral-600 mb-4">These advanced study design options will be available in a future release.</p>
+            <p className="text-sm text-muted-foreground mb-4">These advanced study design options will be available in a future release.</p>
             
             <div className="space-y-3">
               <div className="flex items-center">
