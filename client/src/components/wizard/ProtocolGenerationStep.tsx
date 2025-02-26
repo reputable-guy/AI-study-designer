@@ -322,30 +322,30 @@ export default function ProtocolGenerationStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold">Protocol Document</h2>
-          <p className="text-neutral-500">
+          <h2 className="text-xl font-semibold text-foreground">Protocol Document</h2>
+          <p className="text-muted-foreground">
             {isGenerating 
               ? "Generating your IRB-ready protocol document..."
               : "Your IRB-ready protocol document has been generated based on your study design."}
           </p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Generated</span>
+          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Generated</span>
         </div>
       </div>
       
       {/* Protocol header */}
-      <Card className="mb-6">
+      <Card className="mb-6 bg-card border-border">
         <CardContent className="p-4">
-          <h2 className="text-xl font-semibold text-center mb-1">{protocol.title}</h2>
-          <div className="text-center text-sm text-neutral-500 mb-4">
+          <h2 className="text-xl font-semibold text-center mb-1 text-foreground">{protocol.title}</h2>
+          <div className="text-center text-sm text-muted-foreground mb-4">
             <span>Version {protocol.version}</span>
             <span className="mx-2">•</span>
             <span>{protocol.date}</span>
           </div>
           
           <div className="flex items-center justify-center mb-2">
-            <div className="p-2 bg-green-50 text-green-700 rounded-md text-sm flex items-center">
+            <div className="p-2 bg-primary/10 text-primary rounded-md text-sm flex items-center">
               <Check className="h-4 w-4 mr-1" /> IRB-Ready Document
             </div>
           </div>

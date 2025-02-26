@@ -900,19 +900,20 @@ export default function StudyDesignStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
+        <button 
+          className="btn-outline-reputable px-4 py-2 rounded"
           onClick={onBack}
           disabled={isSubmitting}
         >
           Back
-        </Button>
-        <Button 
+        </button>
+        <button 
+          className="btn-reputable px-4 py-2 rounded"
           onClick={handleSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Processing..." : "Generate Protocol"}
-        </Button>
+        </button>
       </div>
     </div>
   );
