@@ -1,5 +1,11 @@
 import { ClaimSuggestion } from "./claimService";
-import { Protocol, ComplianceIssue } from './types';
+import { 
+  Protocol, 
+  ComplianceIssue, 
+  StudyEvidence, 
+  OutcomeMeasure, 
+  StudyDesign 
+} from './types';
 
 // Functions for OpenAI API interactions
 
@@ -122,7 +128,7 @@ export async function generateClaimSuggestions(
  * Perform literature review using OpenAI
  * @param claim The selected claim to research
  */
-export async function performLiteratureReview(claim: string): Promise<any> {
+export async function performLiteratureReview(claim: string): Promise<StudyEvidence[]> {
   try {
     const response = await fetch("/api/literature-review/generate", {
       method: "POST",
@@ -148,7 +154,7 @@ export async function performLiteratureReview(claim: string): Promise<any> {
  * Recommend outcome measures using OpenAI
  * @param claim The selected claim for which to generate outcome measures
  */
-export async function recommendOutcomeMeasures(claim: string): Promise<any> {
+export async function recommendOutcomeMeasures(claim: string): Promise<OutcomeMeasure[]> {
   try {
     const response = await fetch("/api/outcome-measures/generate", {
       method: "POST",
@@ -177,8 +183,8 @@ export async function recommendOutcomeMeasures(claim: string): Promise<any> {
  */
 export async function recommendStudyDesign(
   claim: string,
-  outcomeMeasures: any[]
-): Promise<any> {
+  outcomeMeasures: OutcomeMeasure[]
+): Promise<StudyDesign> {
   try {
     const response = await fetch("/api/study-design/generate", {
       method: "POST",
@@ -210,9 +216,9 @@ export async function recommendStudyDesign(
 export async function generateProtocol(
   studyId: number,
   claim: string,
-  studyDesign: any,
-  outcomeMeasures: any[]
-): Promise<any> {
+  studyDesign: StudyDesign,
+  outcomeMeasures: OutcomeMeasure[]
+): Promise<Protocol> {
   try {
     const response = await fetch(`/api/studies/${studyId}/generate-protocol`, {
       method: "POST",
@@ -279,14 +285,14 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
     const protocolSummary = {
       title: protocol.title,
       claim: claim,
-      sections: protocol.sections.map((section: any) => ({
+      sections: protocol.sections.map(section => ({
         title: section.title,
         content: section.content
       }))
     };
     
     // Check for common compliance issues in the protocol
-    const issues = [];
+    const issues: ComplianceIssue[] = [];
     const protocolText = JSON.stringify(protocolSummary);
     
     // Check for potentially problematic terms
@@ -297,7 +303,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "Multiple sections",
         issue: "Disease claim language detected",
         recommendation: "Replace disease claim language with structure/function language. Avoid terms like 'cure', 'treat', or 'prevent disease'.",
-        severity: 'high'
+        severity: 'high' as const
       });
     }
     
@@ -307,7 +313,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "Informed Consent",
         issue: "Missing or inadequate informed consent procedures",
         recommendation: "Add detailed informed consent procedures, including participant rights, study risks, and data privacy information.",
-        severity: 'high'
+        severity: 'high' as const
       });
     }
     
@@ -318,7 +324,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "Safety Monitoring",
         issue: "Inadequate safety monitoring procedures",
         recommendation: "Add comprehensive safety monitoring and adverse event reporting procedures.",
-        severity: 'medium'
+        severity: 'medium' as const
       });
     }
     
@@ -336,7 +342,7 @@ export async function checkProtocolCompliance(protocol: Protocol, claim: string)
         section: "General",
         issue: "Error evaluating compliance",
         recommendation: "An error occurred while evaluating compliance. Please try again.",
-        severity: 'medium'
+        severity: 'medium' as const
       }]
     };
   }
