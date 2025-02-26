@@ -1,0 +1,221 @@
+AI-Driven Study Designer Requirements Document
+1. Introduction & Background
+Product Name / Feature: AI-Driven Study Designer
+Context & Purpose:
+Reputable is expanding its platform to provide a powerful, user-friendly wizard that lets wellness brands design IRB-ready, compliance-focused clinical studies in minutes.
+This feature will serve as a lead generation tool and a data collection mechanism to train our AI further.
+Once the study design is completed, users can optionally proceed with study execution on Reputable (e.g., participant recruitment, compliance tracking, data analysis).
+2. Goals & Objectives
+Empower Wellness Brands to create science-backed, regulatorily compliant study protocols without expert knowledge of clinical research.
+Increase Lead Generation: Drive new brand signups by offering the Study Designer for free.
+Reduce Friction & Errors: Provide automated, AI-powered steps that ensure best practices, minimize compliance risks, and accelerate time-to-protocol.
+Showcase AI “Wow Factor”: Differentiate Reputable with advanced features like literature review, outcome selection, risk assessment, etc.
+3. Scope
+In-Scope
+AI-Driven Hypothesis Refinement: Auto-suggest refined claims/hypothesis based on user’s initial product description, website scraping, and recognized ingredients.
+RAG-Powered Literature Review: Provide interactive evidence summaries, filters (e.g., population, study type), and an AI Q&A function.
+Smart Outcome Selection: Present validated outcome measures with feasibility, regulatory fit, and participant burden scores.  Prioritize wearable measurements where appropriate.
+Study Design Wizard: Suggest study type (observational vs. RCT), sample size range, typical duration, and inclusion/exclusion criteria.  Power analysis to be done on determining appropriate sample size to ensure statistical significance around measured outcomes.
+Protocol Generation: Auto-generate an IRB-ready protocol (objectives, methods, statistical plan, informed consent, etc.).
+Risk & Regulatory Assessment: Provide a compliance score and highlight potential FDA/FTC red flags.
+Report Creation: Generate IRB submission documents to submit the study
+Out of Scope (Initial Release)
+Complex study designs not yet supported by the platform (e.g., multi-arm, crossover designs, advanced randomization frameworks).
+Detailed budget or cost estimation modules.
+Real-time integration with external wearable APIs (beyond basic feasibility notes); deeper integration could be a future phase.
+4. User Personas & Use Cases
+Wellness Brand Founder / Product Manager
+Goal: Quickly design a credible study to support marketing claims.
+Needs: Minimal friction, guidance on compliance, auto-generated protocol.
+Regulatory / Legal Team
+Goal: Validate that study design meets FDA/FTC guidelines.
+Needs: Clear compliance scoring, references to regulations, IRB-ready documentation.
+Researcher / Scientist (Advanced User)
+Goal: Customize the design and measure selection.
+Needs: Ability to override default settings, see references in detail, advanced filtering.
+5. Detailed Functional Requirements
+5.1. Intake & Claim Refinement
+FR1: The system must allow the user to enter a product/intervention name and a single text description of their product claim and optionally a website URL + ingredients.
+FR2: The system shall automatically scrape the URL to identify product type, ingredients, and relevant descriptors (behind the scenes).
+FR3: The system must provide AI-generated refinements to the user’s claim, ensuring specificity and measurability.  E.g. if a user does not know how to generate a hypothesis/claim, the tool will automatically guide them while they are typing it in.
+FR4: The user must be able to accept, reject, or manually edit the suggested refined claim.
+5.2. Literature Review (RAG-Powered)
+FR5: The system shall retrieve relevant studies from internal/external databases related to the refined claim.  This will include PubMed, Google Scholar to start and expand to other databases.
+FR6: Each study must display an Evidence Grade or “strength rating” (e.g., meta-analysis = High, single study = Moderate).
+[V2 Release] FR7: The user shall be able to apply filters (e.g., “human-only trials,” “randomized controlled trials,” specific demographic filters).
+[V2 Release] FR8: An AI Q&A functionality shall be available, allowing users to ask refining questions (e.g., “Did any trials measure REM sleep in post-menopausal women?”).
+FR9: Summaries must include key bullet points: sample size, effect size, dosage, primary outcome.  Please review consensus.app for a sense of the style of the summaries we want to show.
+FR10: Users must be able to expand or collapse more detailed information on each study.
+5.3. Outcome Measurement Selection
+FR11: The system shall recommend 1–3 primary outcome measures based on the claim and literature evidence (e.g., REM Sleep% vs. PSQI).  It will recommend these outcome measures, by reviewing prior studies and prioritizing wearable metrics where possible.  
+FR12: Each recommended measure must display feasibility constraints (e.g., requires a specific wearable) and a participant burden score.
+FR13: The system shall provide a regulatory acceptance or “compliance confidence” rating for each outcome.
+FR14: Users must be able to pick a recommended measure or override with a manual option (with warnings if it’s less validated).  This might happen due to budget constraints from the user.
+5.4. Study Design Wizard
+FR15: The system must propose a study design (e.g. observational vs. RCT) based on the claim, data from the literature review, and risk level.
+FR16: The system shall estimate sample size ranges using effect size data from the literature.
+FR17: The user can adjust duration, sample size, or inclusion/exclusion criteria within the platform’s supported limits.
+FR18: For advanced designs beyond the platform’s current capability (multi-arm, crossover), the system must display a polite “not supported yet” message.
+5.5. Protocol Generation
+FR19: On user command (“Generate Protocol”), the system compiles all inputs (claim, outcomes, design, lit review references) into an IRB-ready protocol.
+FR20: The protocol must include:
+Title & Objectives
+Study Design & Methods
+Statistical Plan / Power Calculation based on effect size to ensure study is well powered.
+Outcome Measures & Rationale
+Safety Monitoring & Adverse Event Reporting
+Informed Consent Language
+FR21: The system shall automatically number sections and include version control for future updates.
+[V2 Release] 5.6. Risk & Regulatory Assessment
+FR22: The system must display a “Compliance Score” indicating Low/Moderate/High risk.
+FR23: The system shall identify potential FDA/FTC issues (e.g., disease claims vs. structure/function claims).
+FR24: The system must provide short remediation advice for high-risk claims.
+[V2 Release] 5.7. Reporting & Export
+FR25: Users must be able to generate different report formats for IRB submission, marketing substantiation, and investor summaries.
+FR26: If the user is running the study on Reputable, the system shall allow brand logo and color scheme customization in the final documents.
+FR27: Users can download these reports as PDF, Word, or view them in an online interface.
+[V2 Release] 5.8. Version Control
+FR28: Each time the user updates their claim, outcome measure, or study design, the system must save a new version.
+FR29: The user must be able to view a version history and revert to a previous version if desired.
+
+6. Non-Functional Requirements
+Performance & Scalability:
+The AI-based steps (claim refinement, RAG literature review) should return results within a user-acceptable response time (e.g., ≤5 seconds for typical queries).
+Security & Privacy:
+Data from the brand’s website or uploaded docs must be handled securely.
+Proper NDAs or data protection agreements may need to be in place, especially for unpublished product info.  We might need to build out a flow to sign an NDA for sensitive data.
+Regulatory Compliance:
+The generated protocol must align with standard IRB requirements.
+The system’s compliance assessments should be regularly updated to reflect current FDA/FTC guidelines.
+Reliability & Availability:
+The platform should maintain a high uptime (targeting 99.9%).
+Maintainability:
+The system must support easy updates to the underlying knowledge base (studies, effect sizes, compliance rules).
+
+7. User Flow Summary
+Below is the high-level user flow mapping to the functionality:
+Input Claim → 2. Claim Refinement → 3. Literature Review & Filters → 4. Outcome Selection → 5. Study Design Wizard → 6. Protocol Generation & Risk Check → 7. Report & Export.
+Each step is guided with minimal friction, showcasing AI-driven suggestions and compliance checks.
+
+8. Technical Considerations
+Architecture
+Frontend: React or Vue-based wizard UI, offering real-time updates.
+Backend AI Services:
+RAG pipeline for literature retrieval (ElasticSearch / vector database + LLM for summarization).
+Database & Storage:
+Store user sessions, study versions, references.
+Third-Party Integrations:
+Potential integration with external study databases (PubMed, clinicaltrials.gov, etc.).
+Data Pipeline for RAG
+Daily or weekly ingestion of relevant scientific papers.
+Summarization layers to generate bullet-pointed “abstract-level” content.
+Evidence grading metadata.
+Security & Compliance
+Must ensure no personal health information is stored at this stage.
+IRB-related documents must be exportable in standard formats (PDF/Word).
+
+9. Risks & Assumptions
+R1: AI Summaries Could Contain Errors
+Mitigation: Provide disclaimers; allow user feedback loops.
+R2: Regulatory Requirements May Evolve
+Mitigation: Maintain a regulatory knowledge database that is regularly updated.
+R3: User Overwhelm
+Mitigation: Keep the UI minimal and guided, with advanced options collapsible.
+A1: We assume enough existing data in the literature to power RAG for common supplement claims.
+A2: We assume that advanced (multi-arm, crossover) designs are out of scope for the MVP.
+
+
+
+
+Reputable’s AI Study Designer: End-to-End UX Flow
+Step 1. Quick Start
+User Input (Minimal):
+Single Text Field: “Briefly describe your product and its main claim.”
+Optional: “Website URL” or “Ingredients List”
+Behind-the-Scenes “Wow”:
+As soon as the user enters this info, the AI silently scrapes their website and references any known ingredient databases to infer product category (e.g., supplement, wearable, app).
+The AI begins preparing relevant data for the next step without requiring extra user clicks.
+User Sees: A clean, single-page interface with just one text field, plus an optional URL field, and a subtle progress indicator (“Step 1 of 7”).
+
+Step 2. Claim Refinement
+AI-Suggested Claims:
+The system returns an on-screen summary of the user’s initial claim.
+It then provides AI-powered refinements or “recommended claims” to make them more specific or scientifically testable (e.g., “Your current claim: ‘Improves sleep quality.’ Suggested refined claim: ‘Increases REM sleep by 20%.’”).
+User Confirmation & Edits:
+The user can accept, reject, or manually tweak the suggested claim.
+The AI updates in real-time with any final adjustments the user makes.
+User Sees: A short list of suggested claims, each labeled with benefits or feasibility hints (“Better validated in prior studies,” “Easier to measure with wearables,” etc.). They pick one to proceed.
+
+Step 3. Interactive Literature Review
+RAG-Powered Data Fetching:
+The AI taps into your knowledge base and external databases to assemble relevant studies supporting (or challenging) the user’s refined claim.
+It auto-calculates Evidence Grades (e.g., meta-analysis = High, single study = Moderate) and organizes them in a visual “heatmap” or structured list.
+Filters & AI Agent:
+A simple filter bar at the top: “Humans only,” “Randomized Trials,” “Specific demographics,” etc.
+An “Ask AI” button allows the user to query deeper: “Show me only studies about magnesium and REM sleep in women over 40.”
+Key Findings Snapshots:
+Each study is summarized in bullet points: sample size, effect size, duration, main conclusion.
+Citations are clickable if the user wants to see more detail.
+User Sees: A dynamic, interactive review panel. They can quickly filter and hover over each study to see “why it matters” for their claim.
+
+Step 4. Smart Outcome Selection
+AI-Recommended Outcomes:
+Based on the literature review, the AI suggests 1–3 validated primary outcome measures (e.g., “REM Sleep% via Oura” or “PSQI survey”).
+Each outcome is labeled with a Regulatory Fit rating, Feasibility note (e.g., “Requires participants to own an Oura Ring”), and Participant Burden score.
+Custom Tweak:
+If the user wants a purely survey-based method or a hybrid approach (wearable + self-report), they can pick from the recommended list or override with a more manual option.
+The AI warns if an outcome measure has lower regulatory acceptance.
+User Sees: A side-by-side comparison of the top recommended outcome measures with quick pros/cons. They select one or two measures and move on.
+
+Step 5. Study Design Wizard
+Design Auto-Suggestions:
+The AI proposes a study type (Observational/RWE or RCT) based on the user’s claim and risk assessment.
+It indicates sample size estimates (pulled from effect sizes found in Step 3) and typical study duration.
+Limited Customization:
+Users can tweak within supported parameters (e.g., adjusting the number of participants, broadening or narrowing inclusion criteria).
+If they request a crossover or multi-arm design you don’t currently support, the wizard politely notes: “This feature is coming soon.”
+Feasibility Flags:
+If wearables or lab tests are required, the wizard shows a quick note: “You’ll need participants with Oura Rings or provide them. Data collection timeline: ~8 weeks recommended.”
+User Sees: A streamlined step-by-step interface (like a short form) where each field is already pre-filled with AI suggestions. They can confirm or adjust quickly.
+
+Step 6. Protocol Generation & Risk Assessment
+One-Click Protocol Draft:
+The system compiles all user selections (claim, outcomes, design, literature) into an IRB-ready protocol document.
+It auto-populates sections like Objectives, Methods, Statistical Plan, Informed Consent Language, etc.
+Compliance Check:
+A Compliance Score (Low/Moderate/High) is displayed, highlighting any FDA/FTC red flags.
+If there are concerns, the wizard provides Remediation Suggestions (e.g., “Change language from ‘cures insomnia’ to ‘promotes healthy sleep patterns’”).
+Version Control:
+The system saves this draft as Version 1. If the user makes changes, it auto-saves subsequent versions.
+User Sees: A confirmation screen with a summary of the protocol, a compliance alert (if needed), and a big “Generate Protocol” button. They can preview or download in PDF/Word.
+
+Step 7. Finalization & Personalized Reports
+Select Report Types:
+IRB Submission Packet: Formatted to meet typical IRB standards.
+Marketing Substantiation Summary: Distilled version focusing on claim support.
+Investor-Ready Deck: High-level overview of study design and potential outcomes.
+Branding & Customization:
+If the user is running the study on your platform, they can add their brand logo, color schemes, and disclaimers.
+If not, they still receive a generic version showing the protocol summary.
+Next Steps:
+“Launch Study on Reputable” button to proceed with participant recruitment and data collection.
+Or “Export” to share with external stakeholders or CRO partners.
+User Sees: A neatly organized “Download Center” with each report. They can also choose to proceed directly to the Reputable execution platform to start recruiting participants.
+
+Why This Flow Wows Users
+Minimal Front-End Effort: They only provide a quick product description and optionally a URL. The AI does the rest in the background.
+Powerful, Interactive Literature Review: The RAG-based engine fetches and ranks studies automatically, giving them an instant knowledge base.
+Guided Yet Flexible: The user receives best-practice suggestions for outcomes and study design but can tweak within the platform’s supported constraints.
+Regulatory Confidence: Each step integrates compliance checks, reducing brand risk and clarifying potential pitfalls.
+Immediate Payoff: At the end of the flow, they have professional-grade reports (IRB, marketing, investor) ready to use—no extra manual formatting required.
+
+Summary of the Flow
+Quick Start: Minimal user inputs + behind-the-scenes data scraping.
+Claim Refinement: AI polishes their initial claim to a testable statement.
+Interactive Literature Review: Evidence tiers, filters, AI Q&A.
+Outcome Selection: Recommended measures with feasibility and burden scoring.
+Study Design Wizard: Pre-fills study type, sample size, and duration; user can tweak.
+Protocol Generation & Risk Assessment: Creates a fully structured, compliance-checked protocol.
+Finalization & Personalized Reports: IRB, marketing, and investor docs ready for download or direct launch.
+This design captures the entire user journey in a streamlined, logical progression—ensuring that each step feels both effortless and robustly supported by AI “magic” behind the scenes.
+
