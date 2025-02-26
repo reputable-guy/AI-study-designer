@@ -1,195 +1,133 @@
-import { apiRequest } from "./queryClient";
+import { ClaimSuggestion } from "./claimService";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Functions for OpenAI API interactions
 
-// Function to simulate claim refinement suggestions based on user input
+/**
+ * Generate claim suggestions using OpenAI
+ * @param originalClaim The original claim provided by the user
+ * @param websiteUrl Optional website URL for additional context
+ * @param ingredients Optional ingredients list
+ */
 export async function generateClaimSuggestions(
   originalClaim: string,
   websiteUrl?: string,
   ingredients?: string
-): Promise<any> {
-  // In a real implementation, this would call the OpenAI API via backend
-  // For now, we simulate with pre-defined responses
+): Promise<ClaimSuggestion[]> {
   try {
-    // Make a request to the backend to generate claims
-    // In production, this would use actual AI via the server
-    const response = await apiRequest("POST", "/api/suggested-claims/generate", {
-      originalClaim,
-      websiteUrl,
-      ingredients
+    // This will be processed by the backend API proxy
+    const response = await fetch("/api/suggested-claims/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        originalClaim,
+        websiteUrl,
+        ingredients,
+      }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to generate claim suggestions");
+    }
+
     return await response.json();
   } catch (error) {
     console.error("Error generating claim suggestions:", error);
-    
-    // Fallback to sample data if the API call fails
-    return [
-      {
-        claim: "Daily consumption of 300mg magnesium bisglycinate increases REM sleep duration by 15-20%",
-        measurability: "Easily measurable",
-        priorEvidence: "Prior evidence exists",
-        participantBurden: "Low",
-        wearableCompatible: true,
-        consumerRelatable: true
-      },
-      {
-        claim: "Magnesium supplementation (300mg daily) improves sleep quality as measured by PSQI score improvement of 2+ points",
-        measurability: "Moderate",
-        priorEvidence: "Strong previous evidence",
-        participantBurden: "Higher",
-        wearableCompatible: false,
-        consumerRelatable: true
-      },
-      {
-        claim: "Regular magnesium supplementation reduces nighttime awakenings by 30% and decreases time to fall asleep by 10+ minutes",
-        measurability: "Moderate",
-        priorEvidence: "Limited previous studies",
-        participantBurden: "Low",
-        wearableCompatible: true,
-        consumerRelatable: true
-      }
-    ];
+    throw error;
   }
 }
 
-// Function to simulate literature review based on claim
+/**
+ * Perform literature review using OpenAI
+ * @param claim The selected claim to research
+ */
 export async function performLiteratureReview(claim: string): Promise<any> {
   try {
-    // In production, this would call the backend which would use OpenAI and RAG
-    const response = await apiRequest("POST", "/api/literature-reviews/generate", {
-      claim
+    const response = await fetch("/api/literature-review/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ claim }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to perform literature review");
+    }
+
     return await response.json();
   } catch (error) {
     console.error("Error performing literature review:", error);
-    
-    // Fallback to sample data
-    return [
-      {
-        title: "Effects of magnesium supplementation on sleep quality",
-        authors: "Nielsen, FH. et al.",
-        journal: "Journal of Sleep Research",
-        year: 2018,
-        sampleSize: 126,
-        effectSize: "18.7% increase in REM",
-        dosage: "320mg daily",
-        duration: "8 weeks",
-        evidenceGrade: "High",
-        summary: "Double-blind, placebo-controlled trial examining the effects of magnesium supplementation on sleep architecture in adults with mild insomnia."
-      },
-      {
-        title: "Magnesium glycinate and sleep architecture: A wearable study",
-        authors: "Johnson, KL. et al.",
-        journal: "Sleep Medicine",
-        year: 2020,
-        sampleSize: 48,
-        effectSize: "14.2% increase in REM",
-        dosage: "300mg daily",
-        duration: "4 weeks",
-        evidenceGrade: "Moderate",
-        summary: "Study using consumer wearable devices to track sleep changes with magnesium supplementation."
-      },
-      {
-        title: "Effects of mineral supplementation on sleep parameters",
-        authors: "Tanaka, H. et al.",
-        journal: "Sleep Science",
-        year: 2019,
-        sampleSize: 22,
-        effectSize: "9.8% increase in REM",
-        dosage: "250mg daily",
-        duration: "3 weeks",
-        evidenceGrade: "Low",
-        summary: "Small pilot study on the effects of various minerals on sleep."
-      }
-    ];
+    throw error;
   }
 }
 
-// Function to simulate outcome measure recommendations
+/**
+ * Recommend outcome measures using OpenAI
+ * @param claim The selected claim for which to generate outcome measures
+ */
 export async function recommendOutcomeMeasures(claim: string): Promise<any> {
   try {
-    const response = await apiRequest("POST", "/api/outcome-measures/recommend", {
-      claim
+    const response = await fetch("/api/outcome-measures/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ claim }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to recommend outcome measures");
+    }
+
     return await response.json();
   } catch (error) {
     console.error("Error recommending outcome measures:", error);
-    
-    // Fallback to sample data
-    return [
-      {
-        name: "REM Sleep Duration",
-        description: "Percentage of time spent in REM sleep per night",
-        feasibility: "High",
-        regulatoryAcceptance: "Accepted",
-        participantBurden: "Low",
-        wearableCompatible: true
-      },
-      {
-        name: "Pittsburgh Sleep Quality Index (PSQI)",
-        description: "Validated questionnaire measuring sleep quality",
-        feasibility: "Medium",
-        regulatoryAcceptance: "Widely accepted",
-        participantBurden: "Medium",
-        wearableCompatible: false
-      },
-      {
-        name: "Sleep Onset Latency",
-        description: "Time to fall asleep after going to bed",
-        feasibility: "High",
-        regulatoryAcceptance: "Accepted",
-        participantBurden: "Low",
-        wearableCompatible: true
-      }
-    ];
+    throw error;
   }
 }
 
-// Function to simulate study design recommendations
+/**
+ * Recommend study design using OpenAI
+ * @param claim The selected claim
+ * @param outcomeMeasures The selected outcome measures
+ */
 export async function recommendStudyDesign(
   claim: string,
   outcomeMeasures: any[]
 ): Promise<any> {
   try {
-    const response = await apiRequest("POST", "/api/study-design/recommend", {
-      claim,
-      outcomeMeasures
+    const response = await fetch("/api/study-design/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ claim, outcomeMeasures }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to recommend study design");
+    }
+
     return await response.json();
   } catch (error) {
     console.error("Error recommending study design:", error);
-    
-    // Fallback to sample data
-    return {
-      type: "Randomized Controlled Trial",
-      sampleSize: {
-        min: 60,
-        recommended: 80,
-        max: 120
-      },
-      duration: "8 weeks",
-      blindingType: "Double-blind",
-      controlType: "Placebo-controlled",
-      inclusionCriteria: [
-        "Adults aged 18-65",
-        "Self-reported sleep difficulties",
-        "No current use of sleep medications"
-      ],
-      exclusionCriteria: [
-        "Diagnosed sleep disorders requiring treatment",
-        "Current use of supplements containing magnesium",
-        "Pregnancy or breastfeeding"
-      ],
-      powerAnalysis: "Based on previous studies, a sample size of 80 participants provides 90% power to detect a 15% increase in REM sleep at a significance level of 0.05."
-    };
+    throw error;
   }
 }
 
-// Function to simulate protocol generation
+/**
+ * Generate study protocol using OpenAI
+ * @param studyId The ID of the study
+ * @param claim The selected claim
+ * @param studyDesign The selected study design
+ * @param outcomeMeasures The selected outcome measures
+ */
 export async function generateProtocol(
   studyId: number,
   claim: string,
@@ -197,75 +135,48 @@ export async function generateProtocol(
   outcomeMeasures: any[]
 ): Promise<any> {
   try {
-    const response = await apiRequest("POST", `/api/studies/${studyId}/generate-protocol`, {
-      claim,
-      studyDesign,
-      outcomeMeasures
+    const response = await fetch(`/api/studies/${studyId}/generate-protocol`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ claim, studyDesign, outcomeMeasures }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to generate protocol");
+    }
+
     return await response.json();
   } catch (error) {
     console.error("Error generating protocol:", error);
-    
-    // Fallback to sample data
-    return {
-      title: "Clinical Study Protocol",
-      version: "1.0",
-      date: new Date().toISOString().split('T')[0],
-      sections: [
-        {
-          title: "Study Objectives",
-          content: `To evaluate the effectiveness of the product in ${claim}`
-        },
-        {
-          title: "Study Design",
-          content: "Randomized, double-blind, placebo-controlled trial"
-        },
-        {
-          title: "Statistical Plan",
-          content: "Power analysis based on prior studies suggests a sample size of 80 participants would provide 90% power to detect the expected effect size."
-        },
-        {
-          title: "Outcome Measures",
-          content: "Primary outcome measure: REM sleep duration as measured by wearable device."
-        },
-        {
-          title: "Safety Monitoring",
-          content: "Adverse events will be monitored throughout the study period."
-        },
-        {
-          title: "Informed Consent",
-          content: "All participants will provide written informed consent prior to enrollment."
-        }
-      ]
-    };
+    throw error;
   }
 }
 
-// Function to assess regulatory compliance
+/**
+ * Assess regulatory considerations using OpenAI
+ * @param claim The selected claim
+ */
 export async function assessRegulatory(claim: string): Promise<any> {
   try {
-    const response = await apiRequest("POST", "/api/compliance/assess", {
-      claim
+    const response = await fetch("/api/regulatory/assess", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ claim }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to assess regulatory considerations");
+    }
+
     return await response.json();
   } catch (error) {
-    console.error("Error assessing regulatory compliance:", error);
-    
-    // Fallback to sample data
-    return {
-      complianceScore: "Moderate",
-      issues: [
-        {
-          severity: "Low",
-          description: "Consider clarifying that results are based on a specific dosage schedule."
-        }
-      ],
-      suggestions: [
-        "Maintain focus on structure/function claims rather than disease treatment",
-        "Ensure clear dosage information is included in all messaging"
-      ]
-    };
+    console.error("Error assessing regulatory considerations:", error);
+    throw error;
   }
 }

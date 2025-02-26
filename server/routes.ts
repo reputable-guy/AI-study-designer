@@ -87,38 +87,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(claims);
   });
   
-  // Claim generation endpoint
+  // Claim generation endpoint using OpenAI
   apiRouter.post("/suggested-claims/generate", async (req: Request, res: Response) => {
-    // In a real implementation, this would call the OpenAI API
-    // For the demo, we return static sample data
-    const sampleClaims = [
-      {
-        claim: "Daily consumption of 300mg magnesium bisglycinate increases REM sleep duration by 15-20%",
-        measurability: "Easily measurable",
-        priorEvidence: "Prior evidence exists",
-        participantBurden: "Low",
-        wearableCompatible: true,
-        consumerRelatable: true
-      },
-      {
-        claim: "Magnesium supplementation (300mg daily) improves sleep quality as measured by PSQI score improvement of 2+ points",
-        measurability: "Moderate",
-        priorEvidence: "Strong previous evidence",
-        participantBurden: "Higher",
-        wearableCompatible: false,
-        consumerRelatable: true
-      },
-      {
-        claim: "Regular magnesium supplementation reduces nighttime awakenings by 30% and decreases time to fall asleep by 10+ minutes",
-        measurability: "Moderate",
-        priorEvidence: "Limited previous studies",
-        participantBurden: "Low",
-        wearableCompatible: true,
-        consumerRelatable: true
+    try {
+      const { originalClaim, websiteUrl, ingredients } = req.body;
+      
+      if (!originalClaim) {
+        return res.status(400).json({ message: "Original claim is required" });
       }
-    ];
-    
-    res.json(sampleClaims);
+      
+      // Check if OpenAI API key is available
+      if (!process.env.OPENAI_API_KEY) {
+        console.warn("OpenAI API key not found, using fallback data");
+        // Return static sample data when API key is not available
+        const sampleClaims = [
+          {
+            claim: "Daily consumption of 300mg magnesium bisglycinate increases REM sleep duration by 15-20%",
+            measurability: "Easily measurable",
+            priorEvidence: "Prior evidence exists",
+            participantBurden: "Low",
+            wearableCompatible: true,
+            consumerRelatable: true
+          },
+          {
+            claim: "Magnesium supplementation (300mg daily) improves sleep quality as measured by PSQI score improvement of 2+ points",
+            measurability: "Moderate",
+            priorEvidence: "Strong previous evidence",
+            participantBurden: "Higher",
+            wearableCompatible: false,
+            consumerRelatable: true
+          },
+          {
+            claim: "Regular magnesium supplementation reduces nighttime awakenings by 30% and decreases time to fall asleep by 10+ minutes",
+            measurability: "Moderate",
+            priorEvidence: "Limited previous studies",
+            participantBurden: "Low",
+            wearableCompatible: true,
+            consumerRelatable: true
+          }
+        ];
+        
+        return res.json(sampleClaims);
+      }
+      
+      // Import OpenAI only when needed to avoid errors when API key is not available
+      const OpenAI = await import('openai');
+      const openai = new OpenAI.default({ apiKey: process.env.OPENAI_API_KEY });
+      
+      // Build prompt context
+      let context = `Original claim: ${originalClaim}`;
+      if (websiteUrl) context += `\nProduct website: ${websiteUrl}`;
+      if (ingredients) context += `\nIngredients: ${ingredients}`;
+      
+      // Send request to OpenAI
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert in clinical study design for wellness products. 
+            You help refine product claims into testable, measurable claims that could be supported through clinical research. 
+            Provide 3 alternative, refined versions of the product claim with these characteristics:
+            1. More specific and measurable
+            2. Focus on clear outcomes and durations
+            3. Quantify effects where possible 
+            
+            For each claim, analyze:
+            - Measurability (how easily it can be tested)
+            - Prior evidence (existence of research supporting this type of claim)
+            - Participant burden (how demanding the study would be for participants)
+            - Whether it could be measured with a wearable device
+            - Whether it is relatable to consumers
+            
+            Format response as JSON array of objects with these properties:
+            { 
+              "claim": "refined claim statement",
+              "measurability": "description",
+              "priorEvidence": "description",
+              "participantBurden": "description",
+              "wearableCompatible": boolean,
+              "consumerRelatable": boolean 
+            }`
+          },
+          {
+            role: "user",
+            content: context
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7
+      });
+      
+      // Parse and validate response
+      const content = response.choices[0].message.content;
+      const result = JSON.parse(content);
+      
+      if (!result.claims && !Array.isArray(result)) {
+        console.error("Invalid OpenAI response format:", result);
+        throw new Error("Invalid response format from AI service");
+      }
+      
+      // Handle different possible response formats
+      const claims = Array.isArray(result) ? result : (result.claims || []);
+      
+      res.json(claims);
+    } catch (error) {
+      console.error("Error generating claims with OpenAI:", error);
+      res.status(500).json({ 
+        message: "Failed to generate claim suggestions", 
+        error: error.message 
+      });
+    }
   });
 
   // Create suggested claim
