@@ -58,8 +58,13 @@ export default function StudyDesigner() {
   
   useEffect(() => {
     if (fetchedStudy) {
-      setStudyData(fetchedStudy);
-      setCurrentStep(fetchedStudy.currentStep);
+      setStudyData(prevData => ({
+        ...prevData,
+        ...(fetchedStudy as StudyDataType)
+      }));
+      if (fetchedStudy.currentStep) {
+        setCurrentStep(fetchedStudy.currentStep);
+      }
     }
   }, [fetchedStudy]);
   
@@ -114,6 +119,13 @@ export default function StudyDesigner() {
   };
   
   const renderCurrentStep = () => {
+    // Make sure we have a valid study ID for components that require it
+    const safeStudyId = studyData.id ?? 0;  // Use 0 as a fallback
+    
+    // Make sure we have valid strings for required string properties
+    const safeOriginalClaim = studyData.originalClaim || "";
+    const safeRefinedClaim = studyData.refinedClaim || "";
+    
     switch (currentStep) {
       case 1:
         return (
@@ -121,7 +133,7 @@ export default function StudyDesigner() {
             onNext={handleQuickStartNext}
             defaultValues={{
               productName: studyData.productName,
-              originalClaim: studyData.originalClaim,
+              originalClaim: safeOriginalClaim,
               websiteUrl: studyData.websiteUrl,
               ingredients: studyData.ingredients
             }}
@@ -130,8 +142,8 @@ export default function StudyDesigner() {
       case 2:
         return (
           <ClaimRefinementStep
-            studyId={studyData.id}
-            originalClaim={studyData.originalClaim}
+            studyId={safeStudyId}
+            originalClaim={safeOriginalClaim}
             websiteUrl={studyData.websiteUrl}
             ingredients={studyData.ingredients}
             onNext={handleClaimRefinementNext}
@@ -141,8 +153,8 @@ export default function StudyDesigner() {
       case 3:
         return (
           <LiteratureReviewStep
-            studyId={studyData.id}
-            refinedClaim={studyData.refinedClaim}
+            studyId={safeStudyId}
+            refinedClaim={safeRefinedClaim}
             onNext={handleLiteratureReviewNext}
             onBack={() => setCurrentStep(2)}
           />
@@ -150,8 +162,8 @@ export default function StudyDesigner() {
       case 4:
         return (
           <OutcomeSelectionStep
-            studyId={studyData.id}
-            refinedClaim={studyData.refinedClaim}
+            studyId={safeStudyId}
+            refinedClaim={safeRefinedClaim}
             onNext={handleOutcomeSelectionNext}
             onBack={() => setCurrentStep(3)}
           />
@@ -159,8 +171,8 @@ export default function StudyDesigner() {
       case 5:
         return (
           <StudyDesignStep
-            studyId={studyData.id}
-            refinedClaim={studyData.refinedClaim}
+            studyId={safeStudyId}
+            refinedClaim={safeRefinedClaim}
             outcomeMeasures={studyData.outcomeMeasures || []}
             onNext={handleStudyDesignNext}
             onBack={() => setCurrentStep(4)}
@@ -169,8 +181,8 @@ export default function StudyDesigner() {
       case 6:
         return (
           <ProtocolGenerationStep
-            studyId={studyData.id}
-            refinedClaim={studyData.refinedClaim}
+            studyId={safeStudyId}
+            refinedClaim={safeRefinedClaim}
             studyDesign={studyData.studyDesign}
             outcomeMeasures={studyData.outcomeMeasures || []}
             onNext={handleProtocolNext}
@@ -180,7 +192,7 @@ export default function StudyDesigner() {
       case 7:
         return (
           <ExportStep
-            studyId={studyData.id}
+            studyId={safeStudyId}
             protocol={studyData.protocol}
             onBack={() => setCurrentStep(6)}
           />
