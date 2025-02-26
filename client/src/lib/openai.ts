@@ -1,5 +1,4 @@
 import { ClaimSuggestion } from "./claimService";
-import { Protocol, ComplianceIssue } from './types';
 
 // Functions for OpenAI API interactions
 
@@ -265,12 +264,7 @@ export async function assessRegulatory(claim: string): Promise<any> {
  * @param protocol The protocol to check
  * @param claim The claim being tested
  */
-interface ComplianceResult {
-  isCompliant: boolean;
-  issues: ComplianceIssue[];
-}
-
-export async function checkProtocolCompliance(protocol: Protocol, claim: string): Promise<ComplianceResult> {
+export async function checkProtocolCompliance(protocol: any, claim: string): Promise<any> {
   try {
     // In a real implementation, this would call the backend
     // For now, we'll simulate the API response directly

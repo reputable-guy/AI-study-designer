@@ -60,29 +60,6 @@ export interface StudyDesign {
   recruitmentDifficulty?: number; // Recruitment difficulty score (1-10)
 }
 
-export interface ProtocolSection {
-  title: string;
-  content: string;
-}
-
-export interface ComplianceIssue {
-  section: string;
-  issue: string;
-  recommendation: string;
-  severity: 'high' | 'medium' | 'low';
-}
-
-export interface Protocol {
-  title: string;
-  version: string;
-  date: string;
-  sections: ProtocolSection[];
-  complianceStatus?: {
-    isCompliant: boolean;
-    issues?: ComplianceIssue[];
-  };
-}
-
 export interface StudyData {
   id: number | null;
   userId: number;
@@ -94,5 +71,5 @@ export interface StudyData {
   currentStep: number;
   outcomeMeasures: OutcomeMeasure[] | null;
   studyDesign: StudyDesign | null;
-  protocol: Protocol | null;
+  protocol: any | null;
 }
