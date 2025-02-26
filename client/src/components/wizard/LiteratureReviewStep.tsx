@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { performLiteratureReview } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ChevronDown, ChevronUp, Search, Info } from "lucide-react";
+import { useTestMode } from "@/lib/TestModeContext";
+import { getFallbackLiteratureReviews } from "@/lib/errorHandling";
 
 interface StudyEvidence {
   id?: number;
@@ -45,6 +47,7 @@ export default function LiteratureReviewStep({
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All Studies");
   const { toast } = useToast();
+  const { isTestMode } = useTestMode();
   
   useEffect(() => {
     const fetchLiteratureReviews = async () => {
