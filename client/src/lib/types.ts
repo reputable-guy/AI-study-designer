@@ -57,6 +57,7 @@ export interface StudyDesign {
   inclusionCriteria: string[];
   exclusionCriteria: string[];
   powerAnalysis: string;
+  recruitmentDifficulty?: number; // Recruitment difficulty score (1-10)
 }
 
 export interface StudyData {

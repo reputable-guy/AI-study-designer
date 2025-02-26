@@ -148,7 +148,8 @@ export const getFallbackStudyDesign = (): StudyDesign => ({
     "Current use of medications affecting sleep",
     "Shift workers"
   ],
-  powerAnalysis: "Sample size of 120 provides 80% power to detect 15% improvement in primary outcome"
+  powerAnalysis: "Sample size of 120 provides 80% power to detect 15% improvement in primary outcome",
+  recruitmentDifficulty: 4 // Moderate difficulty (scale of 1-10)
 });
 
 // Standard error handler for API requests

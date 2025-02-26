@@ -185,7 +185,10 @@ export default function StudyDesignStep({
             sampleSize: {
               ...studyDesign?.sampleSize,
               selected: sampleSize
-            }
+            },
+            inclusionCriteria: inclusionCriteria, // Use the edited inclusion criteria
+            exclusionCriteria: exclusionCriteria, // Use the edited exclusion criteria
+            recruitmentDifficulty: recruitmentDifficulty // Include recruitment difficulty score
           },
           currentStep: 6 // Move to protocol generation step
         })
@@ -565,7 +568,10 @@ export default function StudyDesignStep({
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        document.querySelector('[aria-label="Learn More"]')?.click();
+                        const learnMoreBtn = document.querySelector('[aria-label="Learn More"]');
+                        if (learnMoreBtn instanceof HTMLElement) {
+                          learnMoreBtn.click();
+                        }
                       }}
                       className="ml-1 text-blue-600 underline underline-offset-2"
                     >
@@ -581,32 +587,279 @@ export default function StudyDesignStep({
         {/* Inclusion and exclusion criteria */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-medium text-lg text-neutral-800 mb-4">Participant Criteria</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-medium text-lg text-neutral-800">Participant Criteria</h3>
+              <Button
+                variant="outline" 
+                size="sm" 
+                className="gap-1 h-8"
+                onClick={() => setShowDifficultyInfo(!showDifficultyInfo)}
+              >
+                <span>Recruitment Score: </span>
+                <span className={`font-medium ${
+                  recruitmentDifficulty <= 4 ? 'text-green-600' : 
+                  recruitmentDifficulty <= 7 ? 'text-amber-600' : 
+                  'text-red-600'
+                }`}>
+                  {recruitmentDifficulty}/10
+                </span>
+              </Button>
+            </div>
+
+            {showDifficultyInfo && (
+              <div className="mb-4 p-3 bg-amber-50 rounded-md">
+                <div className="flex gap-2">
+                  <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Recruitment Difficulty Score: {recruitmentDifficulty}/10</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      {recruitmentDifficulty <= 4 
+                        ? "This study should be relatively easy to recruit for. The criteria are broad enough to find suitable participants."
+                        : recruitmentDifficulty <= 7
+                        ? "This study may face moderate recruitment challenges. Consider whether any criteria could be adjusted."
+                        : "This study faces significant recruitment challenges. The criteria are restrictive, which may extend your recruitment timeline."
+                      }
+                    </p>
+                    <p className="text-xs text-amber-600 mt-2">
+                      Note: Each criterion adds to recruitment difficulty. Limiting to 5 inclusion and 5 exclusion criteria is recommended.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-neutral-700 mb-2">Inclusion Criteria (must meet all):</h4>
-              <ul className="space-y-2">
-                {studyDesign.inclusionCriteria.map((criterion, index) => (
-                  <li key={`inclusion-${index}`} className="flex items-start">
-                    <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                    <span className="text-sm">{criterion}</span>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-sm font-medium text-neutral-700">Inclusion Criteria (must meet all):</h4>
+                <span className="text-xs text-neutral-500">
+                  {inclusionCriteria.length}/5 criteria
+                </span>
+              </div>
+
+              <ul className="space-y-2 mb-3">
+                {inclusionCriteria.map((criterion, index) => (
+                  <li key={`inclusion-${index}`} className="flex items-start group border border-transparent hover:border-neutral-200 hover:bg-neutral-50 rounded-md p-2">
+                    <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                    {editingInclusionIndex === index ? (
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          type="text"
+                          value={newInclusionCriterion}
+                          onChange={(e) => setNewInclusionCriterion(e.target.value)}
+                          className="flex-1 text-sm p-1 border border-neutral-300 rounded"
+                          placeholder="Enter criterion"
+                        />
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => {
+                            if (newInclusionCriterion.trim()) {
+                              const updated = [...inclusionCriteria];
+                              updated[index] = newInclusionCriterion.trim();
+                              setInclusionCriteria(updated);
+                              setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+                                updated, exclusionCriteria
+                              ));
+                            }
+                            setEditingInclusionIndex(null);
+                            setNewInclusionCriterion("");
+                          }}
+                        >
+                          Save
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => {
+                            setEditingInclusionIndex(null);
+                            setNewInclusionCriterion("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-sm flex-1">{criterion}</span>
+                        <div className="opacity-0 group-hover:opacity-100 flex gap-1 flex-shrink-0">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-7 px-2"
+                            onClick={() => {
+                              setNewInclusionCriterion(criterion);
+                              setEditingInclusionIndex(index);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-7 px-2 text-red-500 hover:text-red-700"
+                            onClick={() => {
+                              const updated = inclusionCriteria.filter((_, i) => i !== index);
+                              setInclusionCriteria(updated);
+                              setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+                                updated, exclusionCriteria
+                              ));
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
+              
+              {inclusionCriteria.length < 5 && (
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="text"
+                    value={newInclusionCriterion}
+                    onChange={(e) => setNewInclusionCriterion(e.target.value)}
+                    className="flex-1 text-sm p-2 border border-neutral-300 rounded"
+                    placeholder="Add new inclusion criterion"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={!newInclusionCriterion.trim()}
+                    onClick={() => {
+                      if (newInclusionCriterion.trim()) {
+                        const updated = [...inclusionCriteria, newInclusionCriterion.trim()];
+                        setInclusionCriteria(updated);
+                        setNewInclusionCriterion("");
+                        setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+                          updated, exclusionCriteria
+                        ));
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              )}
             </div>
             
             <Separator className="my-4" />
             
             <div>
-              <h4 className="text-sm font-medium text-neutral-700 mb-2">Exclusion Criteria (must not meet any):</h4>
-              <ul className="space-y-2">
-                {studyDesign.exclusionCriteria.map((criterion, index) => (
-                  <li key={`exclusion-${index}`} className="flex items-start">
-                    <AlertCircle className="h-4 w-4 text-red-500 mr-2 mt-0.5" />
-                    <span className="text-sm">{criterion}</span>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-sm font-medium text-neutral-700">Exclusion Criteria (must not meet any):</h4>
+                <span className="text-xs text-neutral-500">
+                  {exclusionCriteria.length}/5 criteria
+                </span>
+              </div>
+
+              <ul className="space-y-2 mb-3">
+                {exclusionCriteria.map((criterion, index) => (
+                  <li key={`exclusion-${index}`} className="flex items-start group border border-transparent hover:border-neutral-200 hover:bg-neutral-50 rounded-md p-2">
+                    <AlertCircle className="h-4 w-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+                    {editingExclusionIndex === index ? (
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          type="text"
+                          value={newExclusionCriterion}
+                          onChange={(e) => setNewExclusionCriterion(e.target.value)}
+                          className="flex-1 text-sm p-1 border border-neutral-300 rounded"
+                          placeholder="Enter criterion"
+                        />
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => {
+                            if (newExclusionCriterion.trim()) {
+                              const updated = [...exclusionCriteria];
+                              updated[index] = newExclusionCriterion.trim();
+                              setExclusionCriteria(updated);
+                              setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+                                inclusionCriteria, updated
+                              ));
+                            }
+                            setEditingExclusionIndex(null);
+                            setNewExclusionCriterion("");
+                          }}
+                        >
+                          Save
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => {
+                            setEditingExclusionIndex(null);
+                            setNewExclusionCriterion("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-sm flex-1">{criterion}</span>
+                        <div className="opacity-0 group-hover:opacity-100 flex gap-1 flex-shrink-0">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-7 px-2"
+                            onClick={() => {
+                              setNewExclusionCriterion(criterion);
+                              setEditingExclusionIndex(index);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-7 px-2 text-red-500 hover:text-red-700"
+                            onClick={() => {
+                              const updated = exclusionCriteria.filter((_, i) => i !== index);
+                              setExclusionCriteria(updated);
+                              setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+                                inclusionCriteria, updated
+                              ));
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
+
+              {exclusionCriteria.length < 5 && (
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="text"
+                    value={newExclusionCriterion}
+                    onChange={(e) => setNewExclusionCriterion(e.target.value)}
+                    className="flex-1 text-sm p-2 border border-neutral-300 rounded"
+                    placeholder="Add new exclusion criterion"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={!newExclusionCriterion.trim()}
+                    onClick={() => {
+                      if (newExclusionCriterion.trim()) {
+                        const updated = [...exclusionCriteria, newExclusionCriterion.trim()];
+                        setExclusionCriteria(updated);
+                        setNewExclusionCriterion("");
+                        setRecruitmentDifficulty(calculateRecruitmentDifficulty(
+                          inclusionCriteria, updated
+                        ));
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
