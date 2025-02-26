@@ -210,12 +210,12 @@ export default function StudyDesignStep({
   if (isLoading || !studyDesign) {
     return (
       <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Study Design</h2>
+        <h2 className="text-xl font-semibold mb-4 text-foreground">Study Design</h2>
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
-              <div className="h-6 bg-neutral-200 rounded w-1/3 mb-3"></div>
-              <div className="h-24 bg-neutral-200 rounded w-full mb-2"></div>
+            <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
+              <div className="h-6 bg-muted rounded w-1/3 mb-3"></div>
+              <div className="h-24 bg-muted rounded w-full mb-2"></div>
             </div>
           ))}
         </div>
@@ -227,43 +227,43 @@ export default function StudyDesignStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold">Study Design</h2>
-          <p className="text-neutral-500">We've designed an optimal study to test your claim.</p>
+          <h2 className="text-xl font-semibold text-foreground">Study Design</h2>
+          <p className="text-muted-foreground">We've designed an optimal study to test your claim.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Optimized</span>
+          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Optimized</span>
         </div>
       </div>
 
       {/* Selected claim display */}
-      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
-        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your selected claim:</h3>
-        <p className="text-neutral-800 font-medium">{refinedClaim}</p>
+      <div className="mb-6 p-4 bg-card border border-border rounded-lg">
+        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your selected claim:</h3>
+        <p className="text-foreground font-medium">{refinedClaim}</p>
       </div>
       
       <div className="space-y-6">
         {/* Study type */}
-        <Card>
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
-            <h3 className="font-medium text-lg text-neutral-800 mb-2">Recommended Study Design</h3>
-            <p className="text-neutral-600 mb-4">Based on your claim and selected outcome measures, we recommend:</p>
+            <h3 className="font-medium text-lg text-foreground mb-2">Recommended Study Design</h3>
+            <p className="text-muted-foreground mb-4">Based on your claim and selected outcome measures, we recommend:</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-neutral-50 p-3 rounded-md">
-                <span className="text-sm text-neutral-500">Study Type:</span>
-                <p className="font-medium">{studyDesign.type}</p>
+              <div className="bg-background border border-border p-3 rounded-md">
+                <span className="text-sm text-muted-foreground">Study Type:</span>
+                <p className="font-medium text-foreground">{studyDesign.type}</p>
               </div>
-              <div className="bg-neutral-50 p-3 rounded-md">
-                <span className="text-sm text-neutral-500">Duration:</span>
-                <p className="font-medium">{studyDesign.duration}</p>
+              <div className="bg-background border border-border p-3 rounded-md">
+                <span className="text-sm text-muted-foreground">Duration:</span>
+                <p className="font-medium text-foreground">{studyDesign.duration}</p>
               </div>
-              <div className="bg-neutral-50 p-3 rounded-md">
-                <span className="text-sm text-neutral-500">Blinding:</span>
-                <p className="font-medium">{studyDesign.blindingType}</p>
+              <div className="bg-background border border-border p-3 rounded-md">
+                <span className="text-sm text-muted-foreground">Blinding:</span>
+                <p className="font-medium text-foreground">{studyDesign.blindingType}</p>
               </div>
-              <div className="bg-neutral-50 p-3 rounded-md">
-                <span className="text-sm text-neutral-500">Control:</span>
-                <p className="font-medium">{studyDesign.controlType}</p>
+              <div className="bg-background border border-border p-3 rounded-md">
+                <span className="text-sm text-muted-foreground">Control:</span>
+                <p className="font-medium text-foreground">{studyDesign.controlType}</p>
               </div>
             </div>
           </CardContent>

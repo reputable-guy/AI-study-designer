@@ -149,34 +149,34 @@ export default function OutcomeSelectionStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold">Select Outcome Measures</h2>
-          <p className="text-neutral-500">Choose how you'll measure the effectiveness of your product.</p>
+          <h2 className="text-xl font-semibold text-foreground">Select Outcome Measures</h2>
+          <p className="text-muted-foreground">Choose how you'll measure the effectiveness of your product.</p>
         </div>
         <div className="flex-shrink-0">
-          <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Recommended</span>
+          <span className="ai-badge text-xs font-medium px-2 py-1 rounded-full">AI-Recommended</span>
         </div>
       </div>
 
       {/* Selected claim display */}
-      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
-        <h3 className="text-sm font-medium text-neutral-500 mb-2">Your selected claim:</h3>
-        <p className="text-neutral-800 font-medium">{refinedClaim}</p>
+      <div className="mb-6 p-4 bg-card border border-border rounded-lg">
+        <h3 className="text-sm font-medium text-muted-foreground mb-2">Your selected claim:</h3>
+        <p className="text-foreground font-medium">{refinedClaim}</p>
       </div>
 
       {/* Outcome measures selection */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-neutral-700 mb-3">Choose a primary outcome measure:</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">Choose a primary outcome measure:</h3>
         
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
-                <div className="h-6 bg-neutral-200 rounded w-1/2 mb-3"></div>
-                <div className="h-4 bg-neutral-200 rounded w-3/4 mb-4"></div>
+              <div key={i} className="p-4 bg-card border border-border rounded-lg shadow-sm animate-pulse">
+                <div className="h-6 bg-muted rounded w-1/2 mb-3"></div>
+                <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div className="h-4 bg-neutral-200 rounded"></div>
-                  <div className="h-4 bg-neutral-200 rounded"></div>
-                  <div className="h-4 bg-neutral-200 rounded"></div>
+                  <div className="h-4 bg-muted rounded"></div>
+                  <div className="h-4 bg-muted rounded"></div>
+                  <div className="h-4 bg-muted rounded"></div>
                 </div>
               </div>
             ))}
@@ -185,12 +185,12 @@ export default function OutcomeSelectionStep({
           <RadioGroup value={selectedMeasureId || ""} onValueChange={setSelectedMeasureId}>
             <div className="space-y-4">
               {outcomeMeasures.map((measure) => (
-                <Card 
+                <div 
                   key={measure.id}
-                  className={`border ${measure.wearableCompatible ? 'border-l-green-500 border-l-4' : ''} hover:shadow-md transition-shadow cursor-pointer`}
+                  className={`card-reputable ${measure.wearableCompatible ? 'border-l-green-500 border-l-4' : ''} hover:shadow-md transition-shadow cursor-pointer`}
                   onClick={() => setSelectedMeasureId(measure.id?.toString() || "")}
                 >
-                  <CardContent className="p-4">
+                  <div className="p-4">
                     <div className="flex items-start">
                       <div className="mr-3 mt-1">
                         <RadioGroupItem 
@@ -201,40 +201,40 @@ export default function OutcomeSelectionStep({
                       <div className="flex-grow">
                         <Label 
                           htmlFor={`measure-${measure.id}`}
-                          className="text-base font-medium text-neutral-800 cursor-pointer"
+                          className="text-base font-medium text-foreground cursor-pointer"
                         >
                           {measure.name}
                         </Label>
                         
-                        <p className="text-sm text-neutral-600 mt-1 mb-3">{measure.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1 mb-3">{measure.description}</p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                           <div className="flex items-center">
                             <OutcomeIcon type={measure.feasibility} />
-                            <span className="text-xs text-neutral-600">Feasibility: {measure.feasibility}</span>
+                            <span className="text-xs text-muted-foreground">Feasibility: {measure.feasibility}</span>
                           </div>
                           <div className="flex items-center">
                             <OutcomeIcon type={measure.regulatoryAcceptance} />
-                            <span className="text-xs text-neutral-600">{measure.regulatoryAcceptance}</span>
+                            <span className="text-xs text-muted-foreground">{measure.regulatoryAcceptance}</span>
                           </div>
                           <div className="flex items-center">
                             {measure.wearableCompatible ? (
                               <>
                                 <Check className="h-4 w-4 text-green-500 mr-1" />
-                                <span className="text-xs text-neutral-600">Wearable compatible</span>
+                                <span className="text-xs text-muted-foreground">Wearable compatible</span>
                               </>
                             ) : (
                               <>
                                 <Info className="h-4 w-4 text-amber-500 mr-1" />
-                                <span className="text-xs text-neutral-600">Participant burden: {measure.participantBurden}</span>
+                                <span className="text-xs text-muted-foreground">Participant burden: {measure.participantBurden}</span>
                               </>
                             )}
                           </div>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           </RadioGroup>
@@ -242,14 +242,14 @@ export default function OutcomeSelectionStep({
       </div>
       
       {/* Measurement methodology note */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+      <div className="mb-6 p-4 bg-muted/30 border border-border rounded-lg">
         <div className="flex">
           <div className="flex-shrink-0 mr-2">
-            <Info className="h-5 w-5 text-blue-500" />
+            <Info className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-blue-800">Measurement Best Practices</h4>
-            <p className="text-sm text-blue-700 mt-1">
+            <h4 className="text-sm font-medium text-foreground">Measurement Best Practices</h4>
+            <p className="text-sm text-muted-foreground mt-1">
               The recommended measures are prioritized based on scientific validity, regulatory acceptance, and participant burden. Wearable-compatible measures (highlighted in green) generally provide more objective data and reduce participant burden.
             </p>
           </div>
@@ -258,19 +258,20 @@ export default function OutcomeSelectionStep({
       
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
+        <button 
+          className="btn-outline-reputable px-4 py-2 rounded"
           onClick={onBack}
           disabled={isSubmitting}
         >
           Back
-        </Button>
-        <Button 
+        </button>
+        <button 
+          className="btn-reputable px-4 py-2 rounded"
           onClick={handleSubmit}
           disabled={isSubmitting || !selectedMeasureId}
         >
           {isSubmitting ? "Processing..." : "Continue to Study Design"}
-        </Button>
+        </button>
       </div>
     </div>
   );
