@@ -3,7 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Check, Info } from "lucide-react";
+import { Check, Info, ArrowLeft, ArrowRight } from "lucide-react";
 import { generateClaimSuggestions } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -499,18 +499,24 @@ export default function ClaimRefinementStep({
       {/* Navigation buttons */}
       <div className="mt-8 flex justify-between">
         <button 
-          className="btn-outline-reputable px-4 py-2 rounded"
+          className="btn-outline-reputable px-4 py-2 rounded flex items-center gap-2"
           onClick={onBack}
           disabled={isSubmitting}
         >
+          <ArrowLeft className="h-4 w-4" />
           Back
         </button>
         <button 
-          className="btn-reputable px-4 py-2 rounded"
+          className="btn-primary-reputable px-4 py-2 rounded flex items-center gap-2"
           onClick={handleSubmit}
           disabled={isSubmitting || !selectedClaimId || (selectedClaimId === "custom" && !customClaim.trim())}
         >
-          {isSubmitting ? "Processing..." : "Continue"}
+          {isSubmitting ? "Processing..." : (
+            <>
+              Continue
+              <ArrowRight className="h-4 w-4" />
+            </>
+          )}
         </button>
       </div>
     </div>
