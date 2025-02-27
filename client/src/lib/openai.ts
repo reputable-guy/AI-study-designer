@@ -107,6 +107,8 @@ export async function generateClaimSuggestions(
  * @param forceTestMode Optional flag to force use of static test data
  */
 export async function performLiteratureReview(claim: string, forceTestMode: boolean = false): Promise<any> {
+  // Determine whether to use test mode
+  const useTestMode = forceTestMode;
   try {
     // Add a query parameter if we want to force test mode
     const endpoint = forceTestMode 

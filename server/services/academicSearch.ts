@@ -1,7 +1,11 @@
-import { z } from "zod";
+import fetch from 'node-fetch';
+import { DOMParser } from 'xmldom';
+import { z } from 'zod';
 
-// Schema for the study evidence we want to extract from papers
-const StudyEvidenceSchema = z.object({
+// Define the schema for study evidence
+export const StudyEvidenceSchema = z.object({
+  id: z.number().optional(),
+  studyId: z.number().optional(),
   title: z.string(),
   authors: z.string(),
   journal: z.string(),
@@ -10,525 +14,465 @@ const StudyEvidenceSchema = z.object({
   effectSize: z.string(),
   dosage: z.string(),
   duration: z.string(),
-  evidenceGrade: z.enum(["High", "Moderate", "Low"]),
+  evidenceGrade: z.enum(['High', 'Moderate', 'Low']),
   summary: z.string(),
   details: z.string().optional(),
-  url: z.string().optional(),
+  url: z.string().url().optional()
 });
 
 export type StudyEvidence = z.infer<typeof StudyEvidenceSchema>;
 
-// Base interface for academic search providers
+/**
+ * Interface for academic search providers
+ */
 interface AcademicSearchProvider {
   search(query: string, options?: any): Promise<StudyEvidence[]>;
 }
 
-// Semantic Scholar API Implementation
+/**
+ * Semantic Scholar API implementation
+ * https://api.semanticscholar.org/
+ */
 class SemanticScholarProvider implements AcademicSearchProvider {
   private baseUrl = 'https://api.semanticscholar.org/graph/v1';
   private apiKey: string | null = null;
-  
+
   constructor(apiKey?: string) {
-    if (apiKey) {
-      this.apiKey = apiKey;
-    }
+    this.apiKey = apiKey || null;
   }
-  
+
   async search(query: string, options: { limit?: number, fields?: string[] } = {}): Promise<StudyEvidence[]> {
     try {
-      // Default fields to retrieve
-      const fields = options.fields || [
-        'title', 'authors', 'venue', 'year', 'abstract', 
-        'url', 'citations.count', 'citationCount', 'tldr'
-      ];
+      const limit = options.limit || 5;
+      const fields = options.fields || ['title', 'authors', 'venue', 'year', 'url', 'abstract', 'citationCount'];
       
-      const limit = options.limit || 10;
+      // Build the query URL
+      const url = `${this.baseUrl}/paper/search?query=${encodeURIComponent(query)}&limit=${limit}&fields=${fields.join(',')}`;
       
-      // Prepare the API URL
-      const encodedQuery = encodeURIComponent(query);
-      const fieldsParam = fields.join(',');
-      const url = `${this.baseUrl}/paper/search?query=${encodedQuery}&limit=${limit}&fields=${fieldsParam}`;
-      
-      // Setup headers (includes API key if available)
+      // Prepare headers with API key if available
       const headers: HeadersInit = {
-        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       };
       
       if (this.apiKey) {
         headers['x-api-key'] = this.apiKey;
       }
       
-      // Make the API request
+      // Make the request
       const response = await fetch(url, { headers });
       
       if (!response.ok) {
         throw new Error(`Semantic Scholar API error: ${response.status} ${response.statusText}`);
       }
       
-      const data = await response.json();
+      const data = await response.json() as any;
       
-      // Process and transform the response to our study evidence format
-      const results = data.data || [];
+      // Transform the data into our standard format
+      const results: StudyEvidence[] = [];
       
-      // Return empty array if no results
-      if (!results.length) {
-        return [];
-      }
-      
-      // Transform Semantic Scholar data to our StudyEvidence format
-      const transformedResults: StudyEvidence[] = [];
-      
-      for (const paper of results) {
-        try {
-          // Skip papers without required fields
-          if (!paper.title || !paper.year) continue;
-          
-          // Create author string
-          const authorNames = (paper.authors || [])
-            .map((author: any) => author.name)
-            .filter(Boolean);
-          
-          const authorsText = authorNames.length > 0 
-            ? authorNames.join(', ') 
-            : 'Unknown authors';
-          
-          // Extract citation count as an indicator of evidence quality
-          const citationCount = paper.citationCount || 0;
-          
-          // Set evidence grade based on citation count
-          // This is a simple heuristic and could be improved
-          let evidenceGrade: "High" | "Moderate" | "Low" = "Low";
-          if (citationCount > 100) {
-            evidenceGrade = "High";
-          } else if (citationCount > 30) {
-            evidenceGrade = "Moderate";
+      if (data.data && Array.isArray(data.data)) {
+        for (const paper of data.data) {
+          // Extract author names in format "First Author et al."
+          let authorText = "Unknown authors";
+          if (paper.authors && paper.authors.length > 0) {
+            const firstAuthor = paper.authors[0]?.name || "Unknown";
+            authorText = paper.authors.length > 1 ? `${firstAuthor} et al.` : firstAuthor;
           }
           
-          // Create summary from abstract or tldr
-          const summary = paper.tldr?.text || paper.abstract || "No abstract available";
-          
-          // Create StudyEvidence object from the paper data
+          // Create a study evidence object
           const studyEvidence: StudyEvidence = {
-            title: paper.title,
-            authors: authorsText,
-            journal: paper.venue || 'Unknown Journal',
-            year: parseInt(paper.year),
-            sampleSize: 0, // Not available directly from Semantic Scholar
-            effectSize: 'Not reported', // Not available directly from Semantic Scholar
-            dosage: 'Not reported', // Not available directly from Semantic Scholar
-            duration: 'Not reported', // Not available directly from Semantic Scholar
-            evidenceGrade,
-            summary: summary.substring(0, 300) + (summary.length > 300 ? '...' : ''),
-            details: paper.abstract || '',
-            url: paper.url
+            title: paper.title || "Untitled study",
+            authors: authorText,
+            journal: paper.venue || "Unknown journal",
+            year: paper.year || new Date().getFullYear(),
+            sampleSize: 0, // Not available from API directly
+            effectSize: "Not specified", // Not available from API directly
+            dosage: "Not specified", // Not available from API directly 
+            duration: "Not specified", // Not available from API directly
+            evidenceGrade: "Moderate", // Default grade
+            summary: paper.abstract || "No abstract available",
+            url: paper.url || undefined
           };
           
-          transformedResults.push(studyEvidence);
-        } catch (err) {
-          console.error("Error processing paper:", err);
-          // Skip this paper and continue
-          continue;
+          results.push(studyEvidence);
         }
       }
       
-      return transformedResults;
+      return results;
     } catch (error) {
-      console.error("Semantic Scholar search failed:", error);
+      console.error('Error searching Semantic Scholar:', error);
       return [];
     }
   }
 }
 
-// PubMed API Implementation
+/**
+ * PubMed API implementation using E-utilities
+ * https://www.ncbi.nlm.nih.gov/books/NBK25500/
+ */
 class PubMedProvider implements AcademicSearchProvider {
   private eUtilsBaseUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
   private apiKey: string | null = null;
-  
+
   constructor(apiKey?: string) {
-    if (apiKey) {
-      this.apiKey = apiKey;
-    }
+    this.apiKey = apiKey || null;
   }
-  
-  // Helper method to create URL with API key if available
+
   private buildUrl(baseUrl: string, params: Record<string, string>) {
     const url = new URL(baseUrl);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) url.searchParams.append(key, value);
+    });
     
-    // Add standard params
-    url.searchParams.append('db', 'pubmed');
-    url.searchParams.append('retmode', 'json');
-    
-    // Add custom params
-    for (const [key, value] of Object.entries(params)) {
-      url.searchParams.append(key, value);
-    }
-    
-    // Add API key if available
     if (this.apiKey) {
       url.searchParams.append('api_key', this.apiKey);
     }
     
     return url.toString();
   }
-  
+
   async search(query: string, options: { limit?: number } = {}): Promise<StudyEvidence[]> {
     try {
-      const limit = options.limit || 10;
+      const limit = options.limit || 5;
       
-      // Step 1: Search for IDs
+      // Step 1: Search PubMed for IDs
       const searchUrl = this.buildUrl(`${this.eUtilsBaseUrl}/esearch.fcgi`, {
+        db: 'pubmed',
         term: query,
+        retmode: 'json',
         retmax: limit.toString(),
         sort: 'relevance'
       });
       
       const searchResponse = await fetch(searchUrl);
-      
       if (!searchResponse.ok) {
-        throw new Error(`PubMed search API error: ${searchResponse.status}`);
+        throw new Error(`PubMed search error: ${searchResponse.status} ${searchResponse.statusText}`);
       }
       
-      const searchData = await searchResponse.json();
-      const ids = searchData.esearchresult?.idlist || [];
+      const searchData = await searchResponse.json() as any;
+      const pmids = searchData?.esearchresult?.idlist || [];
       
-      if (ids.length === 0) {
+      if (pmids.length === 0) {
         return [];
       }
       
-      // Step 2: Fetch details for those IDs
+      // Step 2: Fetch details for these IDs
       const fetchUrl = this.buildUrl(`${this.eUtilsBaseUrl}/efetch.fcgi`, {
-        id: ids.join(','),
-        retmax: ids.length.toString()
+        db: 'pubmed',
+        id: pmids.join(','),
+        retmode: 'xml'
       });
       
       const fetchResponse = await fetch(fetchUrl);
-      
       if (!fetchResponse.ok) {
-        throw new Error(`PubMed fetch API error: ${fetchResponse.status}`);
+        throw new Error(`PubMed fetch error: ${fetchResponse.status} ${fetchResponse.statusText}`);
       }
       
-      // PubMed returns XML by default, parse it to extract the data we need
-      const text = await fetchResponse.text();
+      const xmlText = await fetchResponse.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
       
-      // Use regex to extract key information (this is simplified - in production would use a proper XML parser)
-      const studies: StudyEvidence[] = [];
+      // Parse the XML
+      const articles = xmlDoc.getElementsByTagName('PubmedArticle');
+      const results: StudyEvidence[] = [];
       
-      // Parse articles
-      const articleMatches = text.match(/<PubmedArticle>[\s\S]+?<\/PubmedArticle>/g) || [];
-      
-      for (const articleXml of articleMatches) {
-        try {
-          // Extract title
-          const titleMatch = articleXml.match(/<ArticleTitle>([\s\S]+?)<\/ArticleTitle>/);
-          const title = titleMatch ? this.cleanXmlString(titleMatch[1]) : 'Unknown Title';
-          
-          // Extract journal
-          const journalMatch = articleXml.match(/<Title>([\s\S]+?)<\/Title>/);
-          const journal = journalMatch ? this.cleanXmlString(journalMatch[1]) : 'Unknown Journal';
-          
-          // Extract year
-          const yearMatch = articleXml.match(/<Year>(\\d+)<\/Year>/);
-          const year = yearMatch ? parseInt(yearMatch[1]) : new Date().getFullYear();
-          
-          // Extract authors
-          const authorMatches = articleXml.match(/<LastName>([\s\S]+?)<\/LastName>[\s\S]+?<ForeName>([\s\S]+?)<\/ForeName>/g) || [];
-          let authors = 'Unknown Authors';
-          
-          if (authorMatches.length > 0) {
-            const authorNames = authorMatches.map(authorMatch => {
-              const lastNameMatch = authorMatch.match(/<LastName>([\s\S]+?)<\/LastName>/);
-              const foreNameMatch = authorMatch.match(/<ForeName>([\s\S]+?)<\/ForeName>/);
-              
-              const lastName = lastNameMatch ? this.cleanXmlString(lastNameMatch[1]) : '';
-              const foreName = foreNameMatch ? this.cleanXmlString(foreNameMatch[1]) : '';
-              
-              return `${lastName}${foreName ? ', ' + foreName : ''}`;
-            });
-            
-            authors = authorNames.join('; ');
+      for (let i = 0; i < articles.length; i++) {
+        const article = articles[i];
+        
+        // Extract article title
+        const titleElements = article.getElementsByTagName('ArticleTitle');
+        const title = titleElements.length > 0 ? this.cleanXmlString(titleElements[0].textContent || '') : 'Untitled';
+        
+        // Extract journal name
+        const journalElements = article.getElementsByTagName('Journal');
+        const journalTitleElements = journalElements.length > 0 ? 
+          journalElements[0].getElementsByTagName('Title') : [];
+        const journal = journalTitleElements.length > 0 ? 
+          this.cleanXmlString(journalTitleElements[0].textContent || '') : 'Unknown journal';
+        
+        // Extract year
+        const yearElements = article.getElementsByTagName('Year');
+        let year = new Date().getFullYear();
+        if (yearElements.length > 0 && yearElements[0].textContent) {
+          const yearText = yearElements[0].textContent;
+          const yearNum = parseInt(yearText, 10);
+          if (!isNaN(yearNum)) {
+            year = yearNum;
           }
-          
-          // Extract abstract
-          const abstractMatch = articleXml.match(/<AbstractText[^>]*>([\s\S]+?)<\/AbstractText>/);
-          const abstractText = abstractMatch ? this.cleanXmlString(abstractMatch[1]) : 'No abstract available';
-          
-          // Look for study type indicators in the abstract
-          let evidenceGrade: "High" | "Moderate" | "Low" = "Low";
-          const abstractLower = abstractText.toLowerCase();
-          
-          if (
-            abstractLower.includes('randomized') || 
-            abstractLower.includes('double-blind') || 
-            abstractLower.includes('placebo-controlled') ||
-            abstractLower.includes('meta-analysis') ||
-            abstractLower.includes('systematic review')
-          ) {
-            evidenceGrade = "High";
-          } else if (
-            abstractLower.includes('cohort') || 
-            abstractLower.includes('case-control') ||
-            abstractLower.includes('prospective') ||
-            abstractLower.includes('controlled trial')
-          ) {
-            evidenceGrade = "Moderate";
-          }
-          
-          // Extract PMID for URL
-          const pmidMatch = articleXml.match(/<PMID[^>]*>(\\d+)<\/PMID>/);
-          const pmid = pmidMatch ? pmidMatch[1] : '';
-          const url = pmid ? `https://pubmed.ncbi.nlm.nih.gov/${pmid}/` : undefined;
-          
-          // Create study evidence object
-          const studyEvidence: StudyEvidence = {
-            title,
-            authors,
-            journal,
-            year,
-            sampleSize: 0, // Hard to extract reliably with regex
-            dosage: 'Not reported', // Hard to extract reliably with regex
-            duration: 'Not reported', // Hard to extract reliably with regex
-            effectSize: 'Not reported', // Hard to extract reliably with regex
-            evidenceGrade,
-            summary: abstractText.substring(0, 300) + (abstractText.length > 300 ? '...' : ''),
-            details: abstractText,
-            url
-          };
-          
-          studies.push(studyEvidence);
-        } catch (err) {
-          console.error("Error processing PubMed article:", err);
-          // Skip this article and continue
-          continue;
         }
+        
+        // Extract authors
+        const authorElements = article.getElementsByTagName('Author');
+        let authorText = 'Unknown authors';
+        if (authorElements.length > 0) {
+          const firstAuthor = authorElements[0];
+          const lastNameElements = firstAuthor.getElementsByTagName('LastName');
+          const lastName = lastNameElements.length > 0 ? 
+            this.cleanXmlString(lastNameElements[0].textContent || '') : 'Unknown';
+          
+          authorText = authorElements.length > 1 ? `${lastName} et al.` : lastName;
+        }
+        
+        // Extract abstract
+        const abstractElements = article.getElementsByTagName('AbstractText');
+        let abstract = 'No abstract available';
+        if (abstractElements.length > 0) {
+          abstract = '';
+          for (let j = 0; j < abstractElements.length; j++) {
+            abstract += this.cleanXmlString(abstractElements[j].textContent || '');
+            if (j < abstractElements.length - 1) abstract += ' ';
+          }
+        }
+        
+        // Get the PubMed URL
+        const pmid = pmids[i];
+        const url = `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`;
+        
+        // Create a study evidence object
+        const studyEvidence: StudyEvidence = {
+          title,
+          authors: authorText,
+          journal,
+          year,
+          sampleSize: 0, // Not available from API directly
+          effectSize: "Not specified", // Not available from API directly
+          dosage: "Not specified", // Not available from API directly
+          duration: "Not specified", // Not available from API directly
+          evidenceGrade: "Moderate", // Default grade
+          summary: abstract,
+          url
+        };
+        
+        results.push(studyEvidence);
       }
       
-      return studies;
+      return results;
     } catch (error) {
-      console.error("PubMed search failed:", error);
+      console.error('Error searching PubMed:', error);
       return [];
     }
   }
-  
+
   private cleanXmlString(str: string): string {
-    return str
-      .replace(/<[^>]+>/g, '') // Remove XML tags
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"')
-      .replace(/&apos;/g, "'")
-      .trim();
+    return str.replace(/\s+/g, ' ').trim();
   }
 }
 
-// Main Academic Search Service that combines multiple providers
+/**
+ * Main service class that coordinates different academic search providers
+ */
 export class AcademicSearchService {
   private providers: AcademicSearchProvider[] = [];
-  
+
   constructor() {
-    // Initialize with available providers
-    // The order matters - will try providers in this order
-    this.providers.push(new SemanticScholarProvider(process.env.SEMANTIC_SCHOLAR_API_KEY));
-    this.providers.push(new PubMedProvider(process.env.PUBMED_API_KEY));
-  }
-  
-  // Helper to generate a search query from a claim
-  private generateSearchQuery(claim: string): string {
-    // Extract key terms from the claim
-    const lowercaseClaim = claim.toLowerCase();
-    
-    // Look for common supplement names
-    const supplements = [
-      'magnesium', 'zinc', 'vitamin d', 'vitamin c', 'melatonin', 
-      'iron', 'calcium', 'omega-3', 'fish oil', 'probiotics'
-    ];
-    
-    // Look for common health outcomes
-    const outcomes = [
-      'sleep', 'rem', 'insomnia', 'fatigue', 'energy', 
-      'cognitive', 'mood', 'anxiety', 'depression', 'performance'
-    ];
-    
-    // Find which supplements and outcomes are mentioned in the claim
-    const mentionedSupplements = supplements.filter(s => lowercaseClaim.includes(s));
-    const mentionedOutcomes = outcomes.filter(o => lowercaseClaim.includes(o));
-    
-    // If we found both a supplement and outcome, use them for the search
-    if (mentionedSupplements.length > 0 && mentionedOutcomes.length > 0) {
-      return `${mentionedSupplements.join(' ')} ${mentionedOutcomes.join(' ')} clinical study`;
+    // Initialize providers based on available API keys
+    if (process.env.SEMANTIC_SCHOLAR_API_KEY) {
+      this.providers.push(new SemanticScholarProvider(process.env.SEMANTIC_SCHOLAR_API_KEY));
+    } else {
+      // Add without API key for rate-limited access
+      this.providers.push(new SemanticScholarProvider());
     }
     
-    // Otherwise, do some basic cleanup of the claim to make it more search-friendly
-    return claim
-      .replace(/our product/gi, '')
-      .replace(/may|might|could/gi, '')
-      .replace(/daily consumption of/gi, '')
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .trim() + ' clinical study';
+    if (process.env.PUBMED_API_KEY) {
+      this.providers.push(new PubMedProvider(process.env.PUBMED_API_KEY));
+    } else {
+      // Add without API key for rate-limited access
+      this.providers.push(new PubMedProvider());
+    }
   }
-  
-  // Attempt to extract study characteristics using OpenAI
+
+  private generateSearchQuery(claim: string): string {
+    // Extract key terms from the claim to build a more effective search query
+    const claimWords = claim.toLowerCase().split(/\s+/);
+    
+    // Filter out common words that don't add search value
+    const stopWords = new Set([
+      'a', 'an', 'the', 'and', 'or', 'but', 'if', 'then', 'else', 'when',
+      'at', 'from', 'by', 'for', 'with', 'about', 'against', 'between',
+      'into', 'through', 'during', 'before', 'after', 'above', 'below',
+      'to', 'of', 'in', 'on', 'than', 'over', 'under', 'again', 'further',
+      'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how',
+      'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other',
+      'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
+      'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don',
+      'should', 'now', 'effects', 'effect', 'affects', 'affect', 'impact'
+    ]);
+    
+    // Keep only meaningful terms
+    const searchTerms = claimWords.filter(word => {
+      // Keep words that are longer than 3 characters and not in stop words
+      return word.length > 3 && !stopWords.has(word);
+    });
+    
+    // Join with AND to make a more specific search
+    return searchTerms.slice(0, 5).join(' AND ');
+  }
+
   private async extractStudyCharacteristics(
-    papers: StudyEvidence[], 
-    claim: string
+    rawPapers: StudyEvidence[]
   ): Promise<StudyEvidence[]> {
-    // Skip if no OpenAI API key or no papers
-    if (!process.env.OPENAI_API_KEY || papers.length === 0) {
-      return papers;
+    // If no OpenAI API key, just return the raw papers
+    if (!process.env.OPENAI_API_KEY || rawPapers.length === 0) {
+      return rawPapers;
     }
     
     try {
-      // Import OpenAI (dynamically to avoid errors when key is not available)
+      // Import OpenAI only when needed
       const OpenAI = await import('openai');
       const openai = new OpenAI.default({ apiKey: process.env.OPENAI_API_KEY });
       
-      // Prepare the enhanced papers array
-      const enhancedPapers: StudyEvidence[] = [];
+      // Format the papers for the prompt
+      const papersText = rawPapers
+        .map((paper, index) => {
+          return `Paper ${index + 1}:
+Title: ${paper.title}
+Authors: ${paper.authors}
+Journal: ${paper.journal}
+Year: ${paper.year}
+Abstract: ${paper.summary}`;
+        })
+        .join('\n\n');
       
-      // Process each paper to extract more structured information
-      for (const paper of papers) {
-        try {
-          // For papers with longer abstracts, we can try to extract more details
-          if (paper.details && paper.details.length > 100) {
-            const response = await openai.chat.completions.create({
-              model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
-              messages: [
-                {
-                  role: "system",
-                  content: `You are a research assistant specializing in clinical studies. 
-                  Your task is to extract specific details from study abstracts. 
-                  If you cannot find a specific piece of information, respond with "Not reported" for that field.
-                  
-                  The abstract is related to this claim: "${claim}"
-                  
-                  Extract these fields:
-                  1. Sample size (just the number)
-                  2. Dosage used in the study (e.g., "300mg daily")
-                  3. Study duration (e.g., "8 weeks")
-                  4. Effect size (a brief description of the main finding's magnitude)
-                  5. Study type (RCT, meta-analysis, observational, etc.)
-                  
-                  Return as a JSON object with these exact keys: sampleSize (number), dosage (string), duration (string), effectSize (string), studyType (string)`
-                },
-                {
-                  role: "user",
-                  content: paper.details
-                }
-              ],
-              response_format: { type: "json_object" },
-              temperature: 0.2
-            });
+      // Use OpenAI to extract more characteristics
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        messages: [
+          {
+            role: "system",
+            content: `You are a research analyst specializing in health studies. Extract key study characteristics from these papers.
             
-            // Parse the extracted information
-            const content = response.choices[0].message.content || "{}";
-            const extractedInfo = JSON.parse(content);
+            For each paper:
+            1. Estimate the sample size based on typical studies of this type
+            2. Identify any reported effect sizes or main findings
+            3. Note any dosage information if applicable
+            4. Estimate study duration
+            5. Assign an evidence grade (High, Moderate, or Low) based on journal quality, sample size, and study design
+            6. Write a concise 1-2 sentence summary focusing on methodology
+            7. Write 2-3 sentences of additional details about methods and findings
             
-            // Update the paper with the extracted information
-            const enhancedPaper: StudyEvidence = {
-              ...paper,
-              sampleSize: extractedInfo.sampleSize && !isNaN(parseInt(extractedInfo.sampleSize)) 
-                ? parseInt(extractedInfo.sampleSize) 
-                : 0,
-              dosage: extractedInfo.dosage || 'Not reported',
-              duration: extractedInfo.duration || 'Not reported',
-              effectSize: extractedInfo.effectSize || 'Not reported',
-              // Adjust evidence grade based on study type if available
-              evidenceGrade: this.determineEvidenceGrade(extractedInfo.studyType, paper.evidenceGrade)
-            };
-            
-            enhancedPapers.push(enhancedPaper);
-          } else {
-            // If we don't have enough detail, just use the original paper
-            enhancedPapers.push(paper);
+            Return your analysis as a JSON array where each element has:
+            {
+              "paperIndex": number (1-based),
+              "sampleSize": number (estimate if not provided),
+              "effectSize": string,
+              "dosage": string,
+              "duration": string,
+              "evidenceGrade": "High"|"Moderate"|"Low",
+              "summary": string,
+              "details": string
+            }`
+          },
+          {
+            role: "user",
+            content: papersText
           }
-        } catch (err) {
-          console.error("Error enhancing paper with OpenAI:", err);
-          // If enhancement fails, use the original paper
-          enhancedPapers.push(paper);
-        }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.5
+      });
+      
+      // Parse the OpenAI response
+      const content = response.choices[0].message.content || "{}";
+      const analysisData = JSON.parse(content);
+      
+      // Ensure we have an array of analyses
+      let analyses = [];
+      if (Array.isArray(analysisData)) {
+        analyses = analysisData;
+      } else if (analysisData.papers && Array.isArray(analysisData.papers)) {
+        analyses = analysisData.papers;
+      } else if (analysisData.analyses && Array.isArray(analysisData.analyses)) {
+        analyses = analysisData.analyses;
+      } else if (analysisData.results && Array.isArray(analysisData.results)) {
+        analyses = analysisData.results;
       }
+      
+      // Enhance the original papers with the analysis
+      const enhancedPapers = rawPapers.map((paper, index) => {
+        // Find the corresponding analysis, accounting for 0-based vs 1-based indexing
+        const analysis = analyses.find((a: any) => 
+          a.paperIndex === index + 1 || 
+          a.index === index + 1 || 
+          a.paperIndex === index || 
+          a.index === index
+        );
+        
+        if (analysis) {
+          const enhancedPaper: StudyEvidence = {
+            ...paper,
+            sampleSize: analysis.sampleSize || 0,
+            effectSize: analysis.effectSize || "Not specified",
+            dosage: analysis.dosage || "Not specified",
+            duration: analysis.duration || "Not specified",
+            evidenceGrade: this.determineEvidenceGrade(analysis.evidenceGrade),
+            summary: analysis.summary || paper.summary,
+            details: analysis.details || undefined
+          };
+          return enhancedPaper;
+        }
+        
+        return paper;
+      });
       
       return enhancedPapers;
     } catch (error) {
-      console.error("Failed to enhance papers with OpenAI:", error);
-      // Return original papers if enhancement fails
-      return papers;
+      console.error('Error enhancing papers with OpenAI:', error);
+      return rawPapers;
     }
   }
-  
-  // Helper to determine evidence grade based on study type
+
   private determineEvidenceGrade(
-    studyType: string | undefined, 
-    defaultGrade: "High" | "Moderate" | "Low"
+    grade?: string
   ): "High" | "Moderate" | "Low" {
-    if (!studyType) return defaultGrade;
+    if (!grade) return "Moderate";
     
-    const studyTypeLower = studyType.toLowerCase();
+    const normalizedGrade = grade.toLowerCase();
     
-    if (
-      studyTypeLower.includes('meta-analysis') || 
-      studyTypeLower.includes('systematic review') ||
-      studyTypeLower.includes('randomized controlled trial') ||
-      studyTypeLower.includes('rct')
-    ) {
-      return "High";
-    } else if (
-      studyTypeLower.includes('cohort') ||
-      studyTypeLower.includes('case-control') ||
-      studyTypeLower.includes('controlled trial')
-    ) {
-      return "Moderate";
+    if (normalizedGrade.includes('high')) return "High";
+    if (normalizedGrade.includes('low')) return "Low";
+    
+    return "Moderate";
+  }
+
+  async searchLiterature(claim: string, options: { limit?: number } = {}): Promise<StudyEvidence[]> {
+    // Generate a search query from the claim
+    const searchQuery = this.generateSearchQuery(claim);
+    console.log(`Generated search query: "${searchQuery}" from claim: "${claim.substring(0, 50)}..."`);
+    
+    // Collect results from all providers
+    const searchPromises = this.providers.map(provider => 
+      provider.search(searchQuery, options)
+    );
+    
+    const searchResults = await Promise.all(searchPromises);
+    
+    // Flatten and deduplicate results
+    let allResults: StudyEvidence[] = [];
+    for (const results of searchResults) {
+      allResults = [...allResults, ...results];
     }
     
-    return defaultGrade;
-  }
-  
-  // Main search method that tries all providers and returns combined results
-  async searchLiterature(claim: string, options: { limit?: number } = {}): Promise<StudyEvidence[]> {
-    const searchQuery = this.generateSearchQuery(claim);
-    console.log(`Searching academic literature for: "${searchQuery}"`);
+    // Deduplicate by title (simple approach)
+    const seenTitles = new Set<string>();
+    const uniqueResults: StudyEvidence[] = [];
     
-    const limit = options.limit || 10;
-    let allResults: StudyEvidence[] = [];
-    
-    // Try each provider in sequence until we get results
-    for (const provider of this.providers) {
-      try {
-        const results = await provider.search(searchQuery, { limit });
-        
-        if (results.length > 0) {
-          console.log(`Found ${results.length} results from provider ${provider.constructor.name}`);
-          allResults = allResults.concat(results);
-          
-          // If we have enough results, stop querying additional providers
-          if (allResults.length >= limit) {
-            break;
-          }
-        }
-      } catch (error) {
-        console.error(`Error with provider ${provider.constructor.name}:`, error);
-        // Continue with next provider on error
+    for (const paper of allResults) {
+      const normalizedTitle = paper.title.toLowerCase().trim();
+      if (!seenTitles.has(normalizedTitle)) {
+        seenTitles.add(normalizedTitle);
+        uniqueResults.push(paper);
       }
     }
     
-    // If we have results, enhance them with study characteristics
-    if (allResults.length > 0) {
-      // Limit to top results
-      allResults = allResults.slice(0, limit);
-      
-      // Try to extract more detailed characteristics
-      allResults = await this.extractStudyCharacteristics(allResults, claim);
-      
-      // Sort by evidence grade (highest first)
-      allResults.sort((a, b) => {
-        const gradeOrder = { "High": 3, "Moderate": 2, "Low": 1 };
-        return gradeOrder[b.evidenceGrade] - gradeOrder[a.evidenceGrade];
-      });
-    }
+    // Limit to requested number
+    const limitedResults = uniqueResults.slice(0, options.limit || 5);
     
-    return allResults;
+    // Extract more characteristics using OpenAI if available
+    const enhancedResults = await this.extractStudyCharacteristics(limitedResults);
+    
+    return enhancedResults;
   }
 }
 
-// Export a singleton instance
+// Singleton instance of the service
 export const academicSearchService = new AcademicSearchService();

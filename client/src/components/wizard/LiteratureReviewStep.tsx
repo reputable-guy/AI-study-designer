@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { performLiteratureReview } from "@/lib/openai";
 import { useToast } from "@/hooks/use-toast";
-import { Check, ChevronDown, ChevronUp, Search, Info } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Search, Info, Database } from "lucide-react";
 import { useTestMode } from "@/lib/TestModeContext";
 import { getFallbackLiteratureReviews } from "@/lib/errorHandling";
 
@@ -47,108 +49,118 @@ export default function LiteratureReviewStep({
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All Studies");
   const { toast } = useToast();
-  const { isTestMode } = useTestMode();
+  const { isTestMode, setTestMode } = useTestMode();
   
   const [isAcademicSource, setIsAcademicSource] = useState(false);
   const [dataSource, setDataSource] = useState<string>("Loading...");
   
-  useEffect(() => {
-    const fetchLiteratureReviews = async () => {
-      setIsLoading(true);
-      setDataSource("Loading...");
+  // Function to fetch literature reviews with the current test mode setting
+  const fetchLiteratureReviews = async (forceTestMode = isTestMode) => {
+    setIsLoading(true);
+    setDataSource("Loading...");
+    
+    try {
+      // First check if we already have saved reviews for this study
+      const response = await fetch(`/api/literature-reviews/study/${studyId}`);
       
-      try {
-        // First check if we already have saved reviews for this study
-        const response = await fetch(`/api/literature-reviews/study/${studyId}`);
+      if (response.ok) {
+        const reviews = await response.json();
         
-        if (response.ok) {
-          const reviews = await response.json();
+        if (reviews && reviews.length > 0) {
+          console.log("Found existing literature reviews for study:", studyId);
+          setStudies(reviews);
+          setFilteredStudies(reviews);
           
-          if (reviews && reviews.length > 0) {
-            console.log("Found existing literature reviews for study:", studyId);
-            setStudies(reviews);
-            setFilteredStudies(reviews);
-            
-            // Check if these are from academic sources
-            const hasAcademicSources = reviews.some((review: StudyEvidence) => !!review.url);
-            setIsAcademicSource(hasAcademicSources);
-            
-            setDataSource(hasAcademicSources 
-              ? "Academic databases" 
-              : "AI-generated research");
-              
-            setIsLoading(false);
-            return;
-          }
-        }
-        
-        // If we're in test mode, use the fallback data
-        if (isTestMode) {
-          console.log("Test mode enabled, using fallback literature review data");
-          const fallbackReviews = getFallbackLiteratureReviews(studyId);
-          setStudies(fallbackReviews);
-          setFilteredStudies(fallbackReviews);
-          setIsAcademicSource(false);
-          setDataSource("Test mode sample data");
-          setIsLoading(false);
-          return;
-        }
-        
-        // Otherwise, fetch new literature reviews, potentially from academic sources
-        console.log("Fetching new literature reviews for claim:", refinedClaim);
-        
-        // Pass forceTestMode=false to ensure we try academic sources if available
-        const generatedReviews = await performLiteratureReview(refinedClaim, false);
-        
-        if (generatedReviews && generatedReviews.length > 0) {
-          // Check if any reviews have URLs, indicating they're from academic sources
-          const hasAcademicSources = generatedReviews.some(
-            (review: StudyEvidence) => !!review.url
-          );
-          
+          // Check if these are from academic sources
+          const hasAcademicSources = reviews.some((review: StudyEvidence) => !!review.url);
           setIsAcademicSource(hasAcademicSources);
+          
           setDataSource(hasAcademicSources 
             ? "Academic databases" 
             : "AI-generated research");
             
-          // Add a small delay for smoother UI transitions
-          setTimeout(() => {
-            setStudies(generatedReviews);
-            setFilteredStudies(generatedReviews);
-            setIsLoading(false);
-          }, 300);
-          
+          setIsLoading(false);
           return;
         }
-        
-        throw new Error("No literature reviews generated");
-      } catch (error) {
-        console.error("Error fetching literature reviews:", error);
-        
-        // Handle timeout errors with a specific message
-        const errorMessage = error instanceof Error && error.message.includes("timed out")
-          ? "Academic database search timed out. Please try again."
-          : "Failed to fetch literature reviews. Using sample data.";
-          
-        toast({
-          title: "Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        
-        // Fallback data - use the centralized fallback data
+      }
+      
+      // If we're in test mode, use the fallback data
+      if (forceTestMode) {
+        console.log("Test mode enabled, using fallback literature review data");
         const fallbackReviews = getFallbackLiteratureReviews(studyId);
         setStudies(fallbackReviews);
         setFilteredStudies(fallbackReviews);
         setIsAcademicSource(false);
-        setDataSource("Sample data (fallback)");
-      } finally {
+        setDataSource("Test mode sample data");
         setIsLoading(false);
+        return;
       }
-    };
-    
+      
+      // Otherwise, fetch new literature reviews, potentially from academic sources
+      console.log("Fetching new literature reviews for claim:", refinedClaim);
+      
+      // Use the forceTestMode parameter to control whether we use test data
+      const generatedReviews = await performLiteratureReview(refinedClaim, forceTestMode);
+      
+      if (generatedReviews && generatedReviews.length > 0) {
+        // Check if any reviews have URLs, indicating they're from academic sources
+        const hasAcademicSources = generatedReviews.some(
+          (review: StudyEvidence) => !!review.url
+        );
+        
+        setIsAcademicSource(hasAcademicSources);
+        setDataSource(hasAcademicSources 
+          ? "Academic databases" 
+          : "AI-generated research");
+          
+        // Add a small delay for smoother UI transitions
+        setTimeout(() => {
+          setStudies(generatedReviews);
+          setFilteredStudies(generatedReviews);
+          setIsLoading(false);
+        }, 300);
+        
+        return;
+      }
+      
+      throw new Error("No literature reviews generated");
+    } catch (error) {
+      console.error("Error fetching literature reviews:", error);
+      
+      // Handle timeout errors with a specific message
+      const errorMessage = error instanceof Error && error.message.includes("timed out")
+        ? "Academic database search timed out. Please try again."
+        : "Failed to fetch literature reviews. Using sample data.";
+        
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      // Fallback data - use the centralized fallback data
+      const fallbackReviews = getFallbackLiteratureReviews(studyId);
+      setStudies(fallbackReviews);
+      setFilteredStudies(fallbackReviews);
+      setIsAcademicSource(false);
+      setDataSource("Sample data (fallback)");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchLiteratureReviews();
-  }, [studyId, refinedClaim, toast, isTestMode]);
+  }, [studyId, refinedClaim, toast]);
+  
+  // Function to toggle test mode
+  const toggleTestMode = () => {
+    const newTestMode = !isTestMode;
+    // Update global test mode
+    setTestMode(newTestMode);
+    // Refresh data with new setting
+    fetchLiteratureReviews(newTestMode);
+  };
   
   useEffect(() => {
     // Filter studies based on search term
@@ -256,6 +268,24 @@ export default function LiteratureReviewStep({
         <p className="text-neutral-800 font-medium">{refinedClaim}</p>
       </div>
       
+      {/* Test mode toggle */}
+      <div className="mb-4 flex items-center justify-between bg-neutral-50 p-3 rounded-lg">
+        <div className="flex items-center">
+          <Database className="h-4 w-4 mr-2 text-neutral-500" />
+          <span className="text-sm font-medium">Academic Database Search</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="test-mode" className="text-sm text-neutral-600">
+            {isTestMode ? "Use sample data" : "Use real academic sources"}
+          </Label>
+          <Switch
+            id="test-mode"
+            checked={!isTestMode}
+            onCheckedChange={() => toggleTestMode()}
+          />
+        </div>
+      </div>
+      
       {/* Data source indicator */}
       <div className="mb-6 flex items-center">
         <div className={`mr-2 p-1 rounded-full ${isAcademicSource ? 'bg-green-100' : 'bg-blue-100'}`}>
@@ -306,7 +336,7 @@ export default function LiteratureReviewStep({
               className="whitespace-nowrap"
               onClick={() => applyFilter("All Studies")}
             >
-              All Studies <ChevronDown className="ml-1 h-4 w-4" />
+              All Studies
             </Button>
             <Button
               variant={activeFilter === "Humans Only" ? "default" : "outline"}
@@ -314,7 +344,7 @@ export default function LiteratureReviewStep({
               className="whitespace-nowrap"
               onClick={() => applyFilter("Humans Only")}
             >
-              Humans Only <ChevronDown className="ml-1 h-4 w-4" />
+              Humans Only
             </Button>
             <Button
               variant={activeFilter === "High Evidence" ? "default" : "outline"}
@@ -322,7 +352,7 @@ export default function LiteratureReviewStep({
               className="whitespace-nowrap"
               onClick={() => applyFilter("High Evidence")}
             >
-              High Evidence <ChevronDown className="ml-1 h-4 w-4" />
+              High Evidence
             </Button>
           </div>
         </div>
@@ -425,14 +455,19 @@ export default function LiteratureReviewStep({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary-500 p-0 h-auto font-medium"
-                      onClick={() => toggleStudyDetails(study.id || 0)}
+                      onClick={() => toggleStudyDetails(study.id)}
+                      className="text-neutral-600 hover:text-neutral-900 p-0 h-auto"
                     >
-                      {expandedStudyId === study.id ? "Hide details" : "Show details"}
                       {expandedStudyId === study.id ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
+                        <>
+                          Hide details
+                          <ChevronUp className="ml-1 h-4 w-4" />
+                        </>
                       ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
+                        <>
+                          Show details
+                          <ChevronDown className="ml-1 h-4 w-4" />
+                        </>
                       )}
                     </Button>
                     

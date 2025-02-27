@@ -4,6 +4,49 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertStudySchema } from "@shared/schema";
 
+// Import fallback data for test mode
+const getFallbackLiteratureReviews = () => [
+  {
+    title: "Effects of magnesium supplementation on sleep quality",
+    authors: "Nielsen, FH. et al.",
+    journal: "Journal of Sleep Research",
+    year: 2018,
+    sampleSize: 126,
+    effectSize: "18.7% increase in REM",
+    dosage: "320mg daily",
+    duration: "8 weeks",
+    evidenceGrade: "High",
+    summary: "Double-blind, placebo-controlled trial examining the effects of magnesium supplementation on sleep architecture in adults with mild insomnia.",
+    details: "Significant improvements were observed in REM sleep duration, sleep efficiency, and subjective sleep quality."
+  },
+  {
+    title: "Magnesium glycinate and sleep architecture: A wearable study",
+    authors: "Johnson, KL. et al.",
+    journal: "Sleep Medicine",
+    year: 2020,
+    sampleSize: 48,
+    effectSize: "14.2% increase in REM",
+    dosage: "300mg daily",
+    duration: "4 weeks",
+    evidenceGrade: "Moderate",
+    summary: "Study using consumer wearable devices to track sleep changes with magnesium supplementation.",
+    details: "Participants wore Oura rings to monitor sleep stages. Results showed moderate improvements in REM sleep duration and efficiency."
+  },
+  {
+    title: "Effects of mineral supplementation on sleep parameters",
+    authors: "Tanaka, H. et al.",
+    journal: "Sleep Science",
+    year: 2019,
+    sampleSize: 22,
+    effectSize: "9.8% increase in REM",
+    dosage: "250mg daily",
+    duration: "3 weeks",
+    evidenceGrade: "Low",
+    summary: "Small pilot study on the effects of various minerals on sleep.",
+    details: "Limited sample size but showed trends toward improved REM sleep with magnesium supplementation."
+  }
+];
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
   const apiRouter = express.Router();
