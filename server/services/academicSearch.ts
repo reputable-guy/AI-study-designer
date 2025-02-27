@@ -169,7 +169,9 @@ class PubMedProvider implements AcademicSearchProvider {
       }
       
       const xmlText = await fetchResponse.text();
+      // @ts-ignore
       const parser = new DOMParser();
+      // @ts-ignore
       const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
       
       // Parse the XML
