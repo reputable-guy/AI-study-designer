@@ -102,25 +102,66 @@ export async function generateClaimSuggestions(
 }
 
 /**
- * Perform literature review using OpenAI
+ * Perform literature review using academic databases and OpenAI
  * @param claim The selected claim to research
+ * @param forceTestMode Optional flag to force use of static test data
  */
-export async function performLiteratureReview(claim: string): Promise<any> {
+export async function performLiteratureReview(claim: string, forceTestMode: boolean = false): Promise<any> {
   try {
-    const response = await fetch("/api/literature-review/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ claim }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Failed to perform literature review");
+    // Add a query parameter if we want to force test mode
+    const endpoint = forceTestMode 
+      ? '/api/literature-review/generate?testMode=true' 
+      : '/api/literature-review/generate';
+    
+    console.log(`Requesting literature review for claim: "${claim.substring(0, 50)}..."`);
+    console.log(`Using endpoint: ${endpoint} (forceTestMode: ${forceTestMode})`);
+    
+    // Add timeout handling to prevent infinite loading
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout (academic APIs can be slow)
+    
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ claim }),
+        signal: controller.signal
+      });
+  
+      clearTimeout(timeoutId); // Clear the timeout if request completes
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to perform literature review");
+      }
+  
+      const data = await response.json();
+      
+      // Log what kind of data we received
+      if (data && Array.isArray(data)) {
+        console.log(`Received ${data.length} literature review items`);
+        
+        // Check if we received results from academic databases
+        const sourcesUsed = data.some(item => item.url) 
+          ? "academic databases" 
+          : "AI-generated data";
+        console.log(`Source of literature review: ${sourcesUsed}`);
+      } else {
+        console.warn("Received non-array literature review data:", typeof data);
+      }
+      
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      const fetchError = error as Error;
+      if (fetchError.name === 'AbortError') {
+        console.error("Literature review request timed out");
+        throw new Error("Request timed out after 45 seconds. Academic database searches can take time, please try again.");
+      }
+      throw fetchError;
     }
-
-    return await response.json();
   } catch (error) {
     console.error("Error performing literature review:", error);
     throw error;

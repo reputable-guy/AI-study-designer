@@ -49,44 +49,90 @@ export default function LiteratureReviewStep({
   const { toast } = useToast();
   const { isTestMode } = useTestMode();
   
+  const [isAcademicSource, setIsAcademicSource] = useState(false);
+  const [dataSource, setDataSource] = useState<string>("Loading...");
+  
   useEffect(() => {
     const fetchLiteratureReviews = async () => {
       setIsLoading(true);
+      setDataSource("Loading...");
+      
       try {
-        // If test mode is enabled, use fallback data immediately
-        if (isTestMode) {
-          console.log("Test mode enabled, using fallback literature review data");
-          const fallbackReviews = getFallbackLiteratureReviews(studyId);
-          setStudies(fallbackReviews);
-          setFilteredStudies(fallbackReviews);
-          setIsLoading(false);
-          return;
-        }
-        
-        // First try to get literature reviews from the API
+        // First check if we already have saved reviews for this study
         const response = await fetch(`/api/literature-reviews/study/${studyId}`);
         
         if (response.ok) {
           const reviews = await response.json();
           
           if (reviews && reviews.length > 0) {
+            console.log("Found existing literature reviews for study:", studyId);
             setStudies(reviews);
             setFilteredStudies(reviews);
+            
+            // Check if these are from academic sources
+            const hasAcademicSources = reviews.some((review: StudyEvidence) => !!review.url);
+            setIsAcademicSource(hasAcademicSources);
+            
+            setDataSource(hasAcademicSources 
+              ? "Academic databases" 
+              : "AI-generated research");
+              
             setIsLoading(false);
             return;
           }
         }
         
-        // If no reviews found, generate new ones using OpenAI
-        const generatedReviews = await performLiteratureReview(refinedClaim);
+        // If we're in test mode, use the fallback data
+        if (isTestMode) {
+          console.log("Test mode enabled, using fallback literature review data");
+          const fallbackReviews = getFallbackLiteratureReviews(studyId);
+          setStudies(fallbackReviews);
+          setFilteredStudies(fallbackReviews);
+          setIsAcademicSource(false);
+          setDataSource("Test mode sample data");
+          setIsLoading(false);
+          return;
+        }
         
-        setStudies(generatedReviews);
-        setFilteredStudies(generatedReviews);
+        // Otherwise, fetch new literature reviews, potentially from academic sources
+        console.log("Fetching new literature reviews for claim:", refinedClaim);
+        
+        // Pass forceTestMode=false to ensure we try academic sources if available
+        const generatedReviews = await performLiteratureReview(refinedClaim, false);
+        
+        if (generatedReviews && generatedReviews.length > 0) {
+          // Check if any reviews have URLs, indicating they're from academic sources
+          const hasAcademicSources = generatedReviews.some(
+            (review: StudyEvidence) => !!review.url
+          );
+          
+          setIsAcademicSource(hasAcademicSources);
+          setDataSource(hasAcademicSources 
+            ? "Academic databases" 
+            : "AI-generated research");
+            
+          // Add a small delay for smoother UI transitions
+          setTimeout(() => {
+            setStudies(generatedReviews);
+            setFilteredStudies(generatedReviews);
+            setIsLoading(false);
+          }, 300);
+          
+          return;
+        }
+        
+        throw new Error("No literature reviews generated");
       } catch (error) {
         console.error("Error fetching literature reviews:", error);
+        
+        // Handle timeout errors with a specific message
+        const errorMessage = error instanceof Error && error.message.includes("timed out")
+          ? "Academic database search timed out. Please try again."
+          : "Failed to fetch literature reviews. Using sample data.";
+          
         toast({
           title: "Error",
-          description: "Failed to fetch literature reviews. Using fallback data.",
+          description: errorMessage,
           variant: "destructive",
         });
         
@@ -94,6 +140,8 @@ export default function LiteratureReviewStep({
         const fallbackReviews = getFallbackLiteratureReviews(studyId);
         setStudies(fallbackReviews);
         setFilteredStudies(fallbackReviews);
+        setIsAcademicSource(false);
+        setDataSource("Sample data (fallback)");
       } finally {
         setIsLoading(false);
       }
@@ -203,9 +251,35 @@ export default function LiteratureReviewStep({
       </div>
 
       {/* Selected claim display */}
-      <div className="mb-6 p-4 bg-neutral-50 rounded-lg">
+      <div className="mb-4 p-4 bg-neutral-50 rounded-lg">
         <h3 className="text-sm font-medium text-neutral-500 mb-2">Your selected claim:</h3>
         <p className="text-neutral-800 font-medium">{refinedClaim}</p>
+      </div>
+      
+      {/* Data source indicator */}
+      <div className="mb-6 flex items-center">
+        <div className={`mr-2 p-1 rounded-full ${isAcademicSource ? 'bg-green-100' : 'bg-blue-100'}`}>
+          {isAcademicSource ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+            </svg>
+          )}
+        </div>
+        <span className="text-sm text-neutral-600">
+          Literature source: <span className="font-medium">{dataSource}</span>
+          {isAcademicSource && (
+            <span className="ml-1 inline-flex items-center text-green-600">
+              <Info className="h-3 w-3 mr-1" />
+              <span className="text-xs">
+                (includes links to published research)
+              </span>
+            </span>
+          )}
+        </span>
       </div>
 
       {/* Search and filter controls */}
@@ -367,6 +441,27 @@ export default function LiteratureReviewStep({
                         <p>{study.summary}</p>
                         {study.details && <p className="mt-2">{study.details}</p>}
                         {!study.details && <p className="mt-2">No additional details available for this study.</p>}
+                        
+                        {/* Source link if available */}
+                        {study.url && (
+                          <div className="mt-3 pt-3 border-t border-neutral-200">
+                            <a 
+                              href={study.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-primary-600 hover:text-primary-800 font-medium"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                              </svg>
+                              View original research paper
+                            </a>
+                            <p className="text-xs text-neutral-500 mt-1">
+                              This link points to the published academic source for this study.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

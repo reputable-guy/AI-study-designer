@@ -80,9 +80,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/literature-review/generate", async (req: Request, res: Response) => {
     try {
       const { claim } = req.body;
+      const testMode = req.query.testMode === 'true';
       
       if (!claim) {
         return res.status(400).json({ message: "Claim is required for literature review" });
+      }
+      
+      // If test mode is explicitly requested, return fallback data
+      if (testMode) {
+        console.log("Test mode requested for literature review, returning fallback data");
+        return res.json(getFallbackLiteratureReviews());
       }
       
       // Import the academic search service
