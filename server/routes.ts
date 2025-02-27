@@ -213,26 +213,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Return static sample data when API key is not available
         const sampleClaims = [
           {
-            claim: "Daily consumption of 300mg magnesium bisglycinate increases REM sleep duration by 15-20%",
-            measurability: "Easily measurable",
-            priorEvidence: "Prior evidence exists",
-            participantBurden: "Low",
-            wearableCompatible: true,
-            consumerRelatable: true
-          },
-          {
-            claim: "Magnesium supplementation (300mg daily) improves sleep quality as measured by PSQI score improvement of 2+ points",
-            measurability: "Moderate",
-            priorEvidence: "Strong previous evidence",
-            participantBurden: "Higher",
-            wearableCompatible: false,
-            consumerRelatable: true
-          },
-          {
-            claim: "Regular magnesium supplementation reduces nighttime awakenings by 30% and decreases time to fall asleep by 10+ minutes",
-            measurability: "Moderate",
-            priorEvidence: "Limited previous studies",
-            participantBurden: "Low",
+            claim: "Daily consumption of magnesium bisglycinate affects REM sleep duration over a 4-week period",
+            measurability: "REM sleep duration can be measured using polysomnography or consumer sleep tracking devices",
+            priorEvidence: "Several studies have investigated the relationship between magnesium and sleep quality",
+            participantBurden: "Requires consistent supplement usage and sleep monitoring",
             wearableCompatible: true,
             consumerRelatable: true
           }
@@ -258,14 +242,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: "system",
             content: `You are an expert in clinical study design for wellness products. Your task is to refine product claims into testable, measurable claims for clinical research.
 
-IMPORTANT: You MUST return exactly 3 claim suggestions in the specified JSON format. Your output MUST be a JSON object with a "suggestions" array containing exactly 3 objects, each with all required fields.
+IMPORTANT: You MUST return exactly 1 claim suggestion in the specified JSON format. Your output MUST be a JSON object with a "suggestions" array containing exactly 1 object with all required fields.
 
-Provide 3 refined versions of the product claim with these characteristics:
-1. More specific and measurable
-2. Focus on clear outcomes and durations
-3. Quantify effects where possible (use percentages or concrete numbers)
+Provide a refined version of the product claim with these characteristics:
+1. Specific and measurable but WITHOUT specific percentages or exact numerical outcomes
+2. Focus on what can be measured (e.g., "effects on REM sleep duration") NOT on predicted results
+3. Include a clear timeframe if appropriate
 
-For each claim, provide the following analysis:
+AVOID MAKING SPECIFIC NUMERIC PREDICTIONS like "increases REM sleep by 15%" or "reduces awakenings by 20%". The claim should just state what will be measured, not what the results will be.
+
+For the claim, provide the following analysis:
 - Measurability: How easily it can be tested with standard methods
 - Prior evidence: Existence of research supporting this type of claim
 - Participant burden: How demanding the study would be for participants
@@ -276,23 +262,7 @@ YOUR RESPONSE MUST BE A VALID JSON OBJECT WITH THIS EXACT STRUCTURE:
 {
   "suggestions": [
     {
-      "claim": "First refined claim statement with specific outcome and duration",
-      "measurability": "Description of how this would be measured",
-      "priorEvidence": "Description of existing research",
-      "participantBurden": "Description of participant requirements",
-      "wearableCompatible": true or false,
-      "consumerRelatable": true or false
-    },
-    {
-      "claim": "Second refined claim statement",
-      "measurability": "Description of how this would be measured",
-      "priorEvidence": "Description of existing research",
-      "participantBurden": "Description of participant requirements",
-      "wearableCompatible": true or false,
-      "consumerRelatable": true or false
-    },
-    {
-      "claim": "Third refined claim statement",
+      "claim": "A refined claim statement that describes what will be measured without predicting the outcome",
       "measurability": "Description of how this would be measured",
       "priorEvidence": "Description of existing research",
       "participantBurden": "Description of participant requirements",

@@ -90,26 +90,10 @@ export async function generateClaimSuggestions(
     console.warn("Using fallback claims due to error");
     return [
       {
-        claim: "Daily consumption of 300mg magnesium bisglycinate increases REM sleep duration by 15-20%",
-        measurability: "Easily measurable",
-        priorEvidence: "Prior evidence exists",
-        participantBurden: "Low",
-        wearableCompatible: true,
-        consumerRelatable: true
-      },
-      {
-        claim: "Magnesium supplementation (300mg daily) improves sleep quality as measured by PSQI score improvement of 2+ points",
-        measurability: "Moderate",
-        priorEvidence: "Strong previous evidence",
-        participantBurden: "Higher",
-        wearableCompatible: false,
-        consumerRelatable: true
-      },
-      {
-        claim: "Regular magnesium supplementation reduces nighttime awakenings by 30% and decreases time to fall asleep by 10+ minutes",
-        measurability: "Moderate",
-        priorEvidence: "Limited previous studies",
-        participantBurden: "Low",
+        claim: "Daily consumption of magnesium bisglycinate affects REM sleep duration over a 4-week period",
+        measurability: "REM sleep duration can be measured using polysomnography or consumer sleep tracking devices",
+        priorEvidence: "Several studies have investigated the relationship between magnesium and sleep quality",
+        participantBurden: "Requires consistent supplement usage and sleep monitoring",
         wearableCompatible: true,
         consumerRelatable: true
       }

@@ -11,32 +11,10 @@ export const getFallbackClaims = (studyId: number): ClaimSuggestion[] => [
   {
     id: 1001,
     studyId,
-    claim: "Our Magnesium supplement may help enhance sleep quality",
-    measurability: "High",
-    priorEvidence: "Moderate",
-    participantBurden: "Low",
-    wearableCompatible: true,
-    consumerRelatable: true,
-    selected: false
-  },
-  {
-    id: 1002,
-    studyId,
-    claim: "Consuming our Magnesium supplement may contribute to improved sleep onset",
-    measurability: "Medium",
-    priorEvidence: "Moderate",
-    participantBurden: "Low",
-    wearableCompatible: true,
-    consumerRelatable: true,
-    selected: false
-  },
-  {
-    id: 1003,
-    studyId,
-    claim: "Daily intake of our Magnesium supplement may increase REM sleep duration",
-    measurability: "High",
-    priorEvidence: "Medium",
-    participantBurden: "Low",
+    claim: "Daily consumption of magnesium bisglycinate affects REM sleep duration over a 4-week period",
+    measurability: "REM sleep duration can be measured using polysomnography or consumer sleep tracking devices",
+    priorEvidence: "Several studies have investigated the relationship between magnesium and sleep quality",
+    participantBurden: "Requires consistent supplement usage and sleep monitoring",
     wearableCompatible: true,
     consumerRelatable: true,
     selected: false
