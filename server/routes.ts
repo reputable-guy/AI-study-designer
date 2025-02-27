@@ -186,9 +186,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hasPubMedKey = !!process.env.PUBMED_API_KEY;
       const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
       
-      // If we don't have any academic API keys, return fallback data
-      if (!hasSemanticScholarKey && !hasPubMedKey) {
-        console.warn("No academic API keys found, using fallback data for literature review");
+      // If we don't have any academic API keys BUT we're not in test mode,
+      // we should try to generate unique AI content instead of using the exact same fallback data
+      if (!hasSemanticScholarKey && !hasPubMedKey && !testMode) {
+        console.warn("No academic API keys found, using OpenAI fallback for literature review");
+        
+        // If we have OpenAI, try to generate some unique evidence 
+        if (hasOpenAIKey) {
+          // Skip to OpenAI generation path below
+        } else {
+          console.warn("No OpenAI API key available either, using fallback data");
+          return res.json(fallbackReviews);
+        }
+      } else if (testMode) {
+        console.log("Test mode requested, using standard fallback data");
         return res.json(fallbackReviews);
       }
       

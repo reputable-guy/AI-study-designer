@@ -108,7 +108,9 @@ export async function generateClaimSuggestions(
  */
 export async function performLiteratureReview(claim: string, forceTestMode: boolean = false): Promise<any> {
   // Determine whether to use test mode
-  const useTestMode = forceTestMode;
+  const useTestMode = forceTestMode; 
+  // Always make this clear in console logs for debugging
+  console.log(`performLiteratureReview: Using ${useTestMode ? 'TEST MODE' : 'REAL MODE'} for literature review`);
   try {
     // Add a query parameter if we want to force test mode
     const endpoint = forceTestMode 
