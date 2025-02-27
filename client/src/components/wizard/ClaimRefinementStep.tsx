@@ -369,8 +369,8 @@ export default function ClaimRefinementStep({
     <div className="p-6">
       <div className="flex items-start mb-6">
         <div className="flex-grow">
-          <h2 className="text-xl font-semibold">Refine your claim</h2>
-          <p className="text-neutral-500">Based on your input, we've identified potential scientific claims you can test.</p>
+          <h2 className="text-xl font-semibold">Refined Testable Claim</h2>
+          <p className="text-neutral-500">Based on your input, we've created a scientifically testable version of your claim.</p>
         </div>
         <div className="flex-shrink-0">
           <span className="ai-badge text-xs font-medium text-white px-2 py-1 rounded-full">AI-Generated</span>
@@ -383,100 +383,101 @@ export default function ClaimRefinementStep({
         <p className="text-neutral-700">{originalClaim}</p>
       </div>
 
-      {/* AI-generated claim suggestions */}
+      {/* AI-generated claim suggestion */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-neutral-700 mb-3">Select a refined claim to test:</h3>
+        <h3 className="text-sm font-medium text-neutral-700 mb-3">AI-Refined Claim:</h3>
         
         {isLoading ? (
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
-                <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
-                </div>
+            <div className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm animate-pulse">
+              <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+                <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
+                <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
               </div>
-            ))}
+            </div>
           </div>
         ) : (
-          <RadioGroup value={selectedClaimId || ""} onValueChange={setSelectedClaimId}>
-            <div className="space-y-4">
-              {suggestedClaims.map((claim) => (
-                <div 
-                  key={claim.id} 
-                  className="ai-suggestion p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedClaimId(claim.id?.toString() || "")}
-                >
-                  <div className="flex items-start">
-                    <div className="mr-3 mt-0.5">
-                      <RadioGroupItem value={claim.id?.toString() || ""} id={`claim-${claim.id}`} />
-                    </div>
-                    <div className="flex-grow">
-                      <Label 
-                        htmlFor={`claim-${claim.id}`}
-                        className="block font-medium text-neutral-800 cursor-pointer"
-                      >
-                        {claim.claim}
-                      </Label>
-                      
-                      <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <FeatureCheck 
-                          text={claim.measurability} 
-                          isPositive={claim.measurability === "Easily measurable"} 
-                        />
-                        <FeatureCheck 
-                          text={claim.priorEvidence} 
-                          isPositive={claim.priorEvidence.includes("evidence exists")} 
-                        />
-                        {claim.wearableCompatible ? (
-                          <FeatureCheck text="Wearable compatible" isPositive={true} />
-                        ) : (
-                          <FeatureCheck text={claim.participantBurden} isPositive={false} />
-                        )}
-                      </div>
-                    </div>
+          <>
+            {suggestedClaims.length > 0 && (
+              <div className="ai-suggestion p-4 bg-white border border-neutral-100 rounded-lg shadow-sm">
+                <div className="flex-grow">
+                  <div className="block font-medium text-neutral-800 mb-3">
+                    {suggestedClaims[0].claim}
                   </div>
-                </div>
-              ))}
-              
-              {/* Custom claim option */}
-              <div 
-                className="p-4 bg-white border border-neutral-100 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setSelectedClaimId("custom")}
-              >
-                <div className="flex items-start">
-                  <div className="mr-3 mt-0.5">
-                    <RadioGroupItem value="custom" id="customClaim" />
-                  </div>
-                  <div className="flex-grow">
-                    <Label 
-                      htmlFor="customClaim"
-                      className="block font-medium text-neutral-800 cursor-pointer"
-                    >
-                      Or write your own refined claim
-                    </Label>
-                    
-                    {selectedClaimId === "custom" && (
-                      <div className="mt-2">
-                        <Textarea
-                          rows={2}
-                          value={customClaim}
-                          onChange={(e) => setCustomClaim(e.target.value)}
-                          placeholder="Describe a specific, measurable claim to test..."
-                          className="w-full"
-                        />
-                        <p className="mt-1 text-xs text-neutral-500">
-                          Note: Custom claims may need additional review to ensure they're measurable and compliant.
-                        </p>
-                      </div>
+                  
+                  <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <FeatureCheck 
+                      text={`Measurability: ${suggestedClaims[0].measurability.length > 30 ? 
+                        suggestedClaims[0].measurability.substring(0, 30) + '...' : 
+                        suggestedClaims[0].measurability}`} 
+                    />
+                    <FeatureCheck 
+                      text={`Prior Evidence: ${suggestedClaims[0].priorEvidence.length > 30 ? 
+                        suggestedClaims[0].priorEvidence.substring(0, 30) + '...' : 
+                        suggestedClaims[0].priorEvidence}`} 
+                    />
+                    {suggestedClaims[0].wearableCompatible ? (
+                      <FeatureCheck text="Wearable compatible" isPositive={true} />
+                    ) : (
+                      <FeatureCheck text={`Burden: ${suggestedClaims[0].participantBurden}`} isPositive={false} />
                     )}
                   </div>
                 </div>
               </div>
+            )}
+            
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button 
+                variant="default" 
+                onClick={() => {
+                  if (suggestedClaims.length > 0) {
+                    setSelectedClaimId(suggestedClaims[0].id?.toString() || "");
+                    setCustomClaim("");
+                  }
+                }}
+                className="font-medium"
+              >
+                Use This Claim
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSelectedClaimId("custom");
+                  if (suggestedClaims.length > 0) {
+                    setCustomClaim(suggestedClaims[0].claim);
+                  }
+                }}
+                className="font-medium"
+              >
+                Edit This Claim
+              </Button>
             </div>
-          </RadioGroup>
+            
+            {/* Custom claim input */}
+            {selectedClaimId === "custom" && (
+              <div className="mt-4 p-4 bg-white border border-neutral-100 rounded-lg shadow-sm">
+                <Label 
+                  htmlFor="customClaimText"
+                  className="block font-medium text-neutral-800 mb-2"
+                >
+                  Edit your claim:
+                </Label>
+                <Textarea
+                  id="customClaimText"
+                  rows={3}
+                  value={customClaim}
+                  onChange={(e) => setCustomClaim(e.target.value)}
+                  placeholder="Describe a specific, measurable claim to test..."
+                  className="w-full"
+                />
+                <p className="mt-2 text-xs text-neutral-500">
+                  Your claim should be specific and measurable, without predicting exact percentages or numerical outcomes.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -491,7 +492,7 @@ export default function ClaimRefinementStep({
         </div>
         <div className="p-3 bg-neutral-50 rounded-lg max-w-lg shadow-sm">
           <p className="text-sm text-neutral-700">
-            <span className="font-medium">AI Research Assistant:</span> The first claim is specifically designed for wearable study compatibility. We found 3 clinical studies that measured similar REM outcomes with magnesium supplementation using the Oura ring and other sleep trackers.
+            <span className="font-medium">AI Research Assistant:</span> This refined claim has been carefully structured to be scientifically testable. It focuses on what will be measured without predicting specific numerical outcomes, making it more appropriate for rigorous research.
           </p>
         </div>
       </div>
